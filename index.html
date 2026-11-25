@@ -11,6 +11,19 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-startup-image" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1206x2622.png">
+<link rel="apple-touch-startup-image" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1320x2868.png">
+<link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1179x2556.png">
+<link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1290x2796.png">
+<link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1170x2532.png">
+<link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1284x2778.png">
+<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1125x2436.png">
+<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1242x2688.png">
+<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash-828x1792.png">
+<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash-750x1334.png">
+<link rel="apple-touch-startup-image" media="(device-width: 360px) and (device-height: 780px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash-1080x2340.png">
+<meta name="color-scheme" content="dark">
+<style>html,body{background:#000;color-scheme:dark}</style>
 <title>evolvr</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -115,6 +128,15 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .bal .balfig{display:flex;justify-content:center;margin:6px -6px 4px}
 .balfig svg{width:100%;max-width:340px;height:auto}
 .balfig svg.dim{opacity:.55}
+.bl{display:grid;gap:8px}
+.brow{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;min-height:62px;padding:10px 16px 10px 12px;border-radius:20px;background:#222;transition:transform .12s}
+.brow:active{transform:scale(.98)}
+.brow .bi svg{width:34px;height:34px;display:block}
+.brow .bt b{display:block;font-size:16px;font-weight:700;color:#eee}
+.brow .bt span{font-size:13px;color:var(--mute);font-weight:500}
+.brow .bx{font-weight:700;font-size:14px;color:var(--mute)}
+.brow.on{background:#fff}.brow.on .bt b{color:#000}.brow.on .bt span,.brow.on .bx{color:#555}
+.brow[disabled]{cursor:default}
 .g3b{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .bopt{min-height:64px;border-radius:20px;background:#222;color:var(--mute);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 6px;text-align:center;transition:transform .12s}
 .bopt:active{transform:scale(.96)}
@@ -151,6 +173,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .proj:last-child{border-bottom:0}
 .inp{width:100%;min-height:52px;border-radius:18px;background:var(--s2);border:1.5px solid #2c2c2c;padding:12px 16px;font-size:16px;outline:0}
 .inp:focus{border-color:#666}
+.inp.need{border-color:var(--red)}
+.inp.need::placeholder{color:var(--red)}
 textarea.inp{min-height:96px;resize:vertical;line-height:1.45}
 select.inp{appearance:none;-webkit-appearance:none;padding-right:40px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
 label.l{display:block;font-size:13px;font-weight:600;color:var(--mute);margin:14px 4px 7px}
@@ -182,7 +206,7 @@ label.l{display:block;font-size:13px;font-weight:600;color:var(--mute);margin:14
 /* level up + onboarding */
 .full{position:fixed;inset:0;z-index:60;background:#000;display:flex;flex-direction:column;overflow:hidden}
 .blob{position:absolute;left:50%;top:-8%;width:130%;height:58%;transform:translateX(-50%);background:radial-gradient(closest-side,#1f1f1f,#101010 55%,rgba(0,0,0,0) 100%);border-radius:46% 54% 50% 50%/52% 46% 54% 48%;animation:morph 9s ease-in-out infinite alternate;pointer-events:none}
-.ob{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;max-width:520px;margin:0 auto;padding-bottom:env(safe-area-inset-bottom,0px)}
+.ob{position:absolute;inset:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;max-width:520px;margin:0 auto;padding-bottom:env(safe-area-inset-bottom,0px)}
 .ob .mid{position:absolute;left:0;right:0;top:44%;padding:0 32px}
 .ob .sheetb{border-radius:28px 28px 0 0;overflow:hidden;animation:up .5s cubic-bezier(.2,.85,.25,1) both}
 .ob .ill{background:#1c1c1c;height:168px;display:grid;place-items:center;overflow:hidden}
@@ -240,6 +264,7 @@ label.l{display:block;font-size:13px;font-weight:600;color:var(--mute);margin:14
  </defs>
 </svg>
 
+<div id="boot" style="position:fixed;inset:0;background:#000;z-index:100;display:flex;align-items:center;justify-content:center;transition:opacity .35s ease"><svg viewBox="0 0 170 40" style="width:46vw" aria-label="evolvr"><text x="85" y="31" text-anchor="middle" fill="#f4f4f4" filter="url(#gl)" class="w" style="font-size:34px">evolvr</text></svg></div>
 <div id="app" hidden>
  <header class="top">
   <svg class="logo" viewBox="0 0 150 34" aria-label="evolvr"><text x="2" y="27" fill="#f4f4f4" filter="url(#gl)" class="w" style="font-size:29px">evolvr</text></svg>
@@ -496,7 +521,7 @@ async function startSync() {
 function fresh(name, missions) {
  const T = todayK();
  memo = null;
- S = { v: 1, name: name || 'max', start: T, set: { cut: 4, req: .7 }, v3: 1, v4: 1, missions, days: {}, demo: false, seen: null, upd: Date.now() };
+ S = { v: 1, name: name || 'toi', start: T, set: { cut: 4, req: .7 }, v3: 1, v4: 1, missions, days: {}, demo: false, seen: null, upd: Date.now() };
 }
 function demo() {
  const name = S ? S.name : 'max', missions = S && S.missions.length ? S.missions : DEF_M();
@@ -542,7 +567,7 @@ function levelUp(b, c) {
 }
 
 /* ---------- vues ---------- */
-const RULES = () => `<div class="rule"><b class="w num">+xp</b><span><b>chaque mission validée.</b> sa stat monte.</span></div><div class="rule"><b class="w num">±${BAL_XP}</b><span><b>ta balance, au bilan du soir (dès ${BAL_H}h).</b> t’as plus produit que consommé ? +${BAL_XP} en build. l’inverse ? −${BAL_XP}.</span></div><div class="rule"><b class="w num">${Math.round(req() * 100)}%</b><span><b>ton objectif du jour.</b> ${Math.round(req() * 100)} % de l’xp possible ce jour-là. atteins-le pour faire monter ta série.</span></div>`;
+const RULES = () => `<div class="rule"><b class="w num">+xp</b><span><b>chaque mission validée.</b> sa stat monte.</span></div><div class="rule"><b class="w num">±${BAL_XP}</b><span><b>ta balance, au bilan du soir (dès ${BAL_H}h).</b> ton temps est surtout allé à construire ? +${BAL_XP}. à consommer ? −${BAL_XP}.</span></div><div class="rule"><b class="w num">${Math.round(req() * 100)}%</b><span><b>ton objectif du jour.</b> ${Math.round(req() * 100)} % de l’xp possible ce jour-là. atteins-le pour faire monter ta série.</span></div>`;
 const rec = b => [['missions', b.mis], ['balance', b.bx]].map(([l, v]) => `<div class="rc"><span>${l}</span><b class="num ${v < 0 ? 'neg' : ''}">${v < 0 ? '−' : '+'}${fmt(Math.abs(v))}</b></div>`).join('');
 function hint(c, b) {
  const T = todayK(), G = b.G, next = b.ms.find(x => !x.on), lock = balLocked(T);
@@ -552,7 +577,7 @@ function hint(c, b) {
  if (danger()) return `hier raté. valide aujourd’hui pour sauver ta série de ${streak()} j.`;
  if (!next && b.bal == null && lock) return `missions bouclées. on se retrouve à ${BAL_H}h pour le bilan.`;
  if (b.bal === -1) return 'journée côté conso. on renverse la balance ?';
- if (b.bal == null && !lock) return 'le bilan du soir est ouvert. t’as plus produit ou plus consommé aujourd’hui ?';
+ if (b.bal == null && !lock) return 'le bilan du soir est ouvert. aujourd’hui, ton temps est surtout allé où ?';
  if (atro) return `ma stat ${atro.n} redescend : ${diffD(c.last[atro.k], T)} jours sans.${next && next.m.stat === atro.k ? ` on fait ${next.m.n} ?` : ''}`;
  if (b.sum <= 0) return next ? `on commence par quoi ? ${next.m.n} ?` : 'dis-moi vers où penche ta journée.';
  return `encore ${fmt(G - b.sum)} xp.${next ? ` prochaine étape : ${next.m.n}.` : ''}`;
@@ -606,11 +631,12 @@ const BAL_H = 17;
 const balLocked = k => { const h = new Date().getHours(); return k === todayK() && h >= cut() && h < BAL_H; };
 function balCard(k, b) {
  const lock = balLocked(k);
- const BL = [[-1, 'plus consommé', `−${BAL_XP} xp`], [0, 'moitié-moitié', '0 xp'], [1, 'plus produit', `+${BAL_XP} xp`]];
- const line = b.bal === 1 ? `<b>+${BAL_XP} xp build.</b> tu produis plus que tu consommes.` : b.bal === 0 ? '<b>équilibré.</b> ni bonus, ni malus.' : b.bal === -1 ? `<b>−${BAL_XP} xp build.</b> demain, on renverse la balance.` : '<b>pas besoin de chiffres.</b> dis juste vers où a penché ta journée.';
+ const ic = { 1: `<svg viewBox="0 0 32 32">${cube(16, 16, 11)}</svg>`, 0: '<svg viewBox="0 0 32 32"><path d="M16 6v20M6 10h20" stroke="#bbb" stroke-width="2.4" stroke-linecap="round"/><path d="M6 10l-4 8h8zM26 10l-4 8h8z" fill="#888"/><rect x="11" y="25" width="10" height="3" rx="1.5" fill="#bbb"/></svg>', '-1': '<svg viewBox="0 0 32 32"><rect x="9" y="3" width="14" height="26" rx="3.5" fill="#0d0d0d" stroke="#aaa" stroke-width="1.8"/><rect x="11.5" y="6.5" width="9" height="17" rx="1.5" fill="#fff" opacity=".8"/></svg>' };
+ const BL = [[1, 'à construire', 'taff, projets, sport, apprendre', `+${BAL_XP}`], [0, 'moitié-moitié', 'un peu des deux', '0'], [-1, 'à consommer', 'scroll, séries, youtube', `−${BAL_XP}`]];
+ const line = b.bal === 1 ? `<b>journée de construction.</b> +${BAL_XP} xp en build.` : b.bal === 0 ? '<b>équilibré.</b> ni bonus, ni malus.' : b.bal === -1 ? `<b>journée de conso.</b> −${BAL_XP} xp en build. demain, on renverse la balance.` : '<b>pas besoin de compter.</b> choisis juste ce qui a pris le plus de place.';
  if (lock) return `<section class="ratio bal sec"><div class="w h2">bilan du soir</div><p class="p sm" style="margin:6px 0 0">s’ouvre à ${BAL_H}h.</p><div class="balfig">${balSvg(null)}</div><p class="p sm" style="margin-top:4px"><b>fais tes missions, on fera les comptes ce soir.</b> d’ici là, construis.</p></section>`;
- return `<section class="ratio bal sec"><div class="w h2">bilan du soir</div><p class="p sm" style="margin:6px 0 0"><b>1. ta balance.</b> ${k === todayK() ? 'aujourd’hui' : 'ce jour-là'}, t’as plus produit ou plus consommé ?</p><div class="balfig">${balSvg(b.bal)}</div>
-  <div class="g3b">${BL.map(([v, l, x]) => `<button class="bopt ${b.bal === v ? 'on' : ''}" ${editable(k) ? `data-a="bal" data-v="${v}"` : 'disabled'} aria-pressed="${b.bal === v}"><b>${l}</b><span>${x}</span></button>`).join('')}</div>
+ return `<section class="ratio bal sec"><div class="w h2">bilan du soir</div><p class="p" style="margin:8px 0 0"><b>1. ${k === todayK() ? 'aujourd’hui' : 'ce jour-là'}, ton temps est surtout allé…</b></p><div class="balfig">${balSvg(b.bal)}</div>
+  <div class="bl">${BL.map(([v, l, ex, x]) => `<button class="brow ${b.bal === v ? 'on' : ''}" ${editable(k) ? `data-a="bal" data-v="${v}"` : 'disabled'} aria-pressed="${b.bal === v}"><span class="bi">${ic[v]}</span><span class="bt"><b>${l}</b><span>${ex}</span></span><span class="bx num">${x} xp</span></button>`).join('')}</div>
   <p class="p sm" style="margin-top:12px">${line}</p><p class="p sm" style="margin:18px 0 10px"><b>2. tes comptes.</b> ton xp du jour et l’avis du coach.</p><button class="pill" data-a="bilan">voir mon bilan</button></section>`;
 }
 function regCard(T) {
@@ -714,7 +740,7 @@ function settings(go) {
   <div class="prow" style="margin-top:10px"><button class="pill sm g" data-a="export">copier une sauvegarde</button><button class="pill sm g" data-a="import">importer</button></div>
   <button class="pill sm o" style="margin-top:10px;width:100%;color:var(--red)" data-a="wipe">nouveau compte : tout effacer</button></details>
   <button class="pill" style="margin-top:22px" data-a="close">ok</button>`);
- $('#sname').addEventListener('change', e => { S.name = e.target.value.trim().slice(0, 20) || 'max'; commit(); });
+ $('#sname').addEventListener('change', e => { S.name = e.target.value.trim().slice(0, 20) || S.name; commit(); });
  $('#sreq').addEventListener('change', e => { S.set.req = +e.target.value; commit(); });
  $('#scut').addEventListener('change', e => { S.set.cut = +e.target.value; commit(); });
 }
@@ -786,16 +812,16 @@ document.addEventListener('visibilitychange', async () => { if (document.hidden 
 /* ---------- onboarding (façon pushr) ---------- */
 const LOGO = (h = 34) => `<svg viewBox="0 0 170 40" style="height:${h}px;width:auto;display:block" aria-label="evolvr"><text x="2" y="31" fill="#f4f4f4" filter="url(#gl)" class="w" style="font-size:34px">evolvr</text></svg>`;
 function onboarding(replay) {
- const ov = $('#over'); let name = S ? S.name : 'max', cst = 'force'; const ms = (S ? S.missions : []).map(m => ({ ...m }));
+ const ov = $('#over'); let name = S ? S.name : '', cst = 'force'; const ms = (S ? S.missions : []).map(m => ({ ...m }));
  const zero = { force: 0, cardio: 0, build: 0, focus: 0, disc: 0, chari: 0 }, mid = { force: .7, cardio: .5, build: .8, focus: .7, disc: .9, chari: .5 };
  const frame = inner => `<div class="full"><div class="blob"></div><div class="ob">${inner}</div></div>`;
  const sheetb = (ill, body) => `<div class="sheetb"><div class="ill">${ill}</div><div class="tx">${body}</div></div>`;
  const steps = [
   () => { ov.innerHTML = frame(`<div class="mid"><div class="w h1 blur-in" id="salut">salut</div></div>`); setTimeout(() => { const s = $('#salut'); if (s) s.className = 'w h1 blur-out'; }, 1300); setTimeout(next, 1900); },
   () => { ov.innerHTML = frame(`<div style="padding:0 22px calc(28px + env(safe-area-inset-bottom,0px))"><div class="w h1 blur-in">bienvenue à</div><div class="blur-in" style="margin-top:6px">${LOGO(40)}</div><p class="p blur-in" style="margin:18px 4px 24px;animation-delay:.15s"><b>evolvr est le jeu où le perso, c’est toi.</b> chaque chose que tu fais dans la vraie vie le fait évoluer : ton sport, ton taff, ce que tu construis.</p><button class="pill blur-in" style="animation-delay:.3s" data-o="next">allons-y</button></div>`); },
-  () => { ov.innerHTML = frame(sheetb(avatar({ t: zero, stage: 0, anim: false, id: 'o1' }).replace('viewBox="0 0 240 290"', 'viewBox="20 40 200 250"'), `<p class="p" style="margin-top:0"><b>ton perso part de zéro.</b> il est mou, il se tient mal, il n’a rien construit.</p><p class="p"><b>tu fais tes pompes, il prend du muscle.</b> tu bosses sur ton business, son socle monte. tu lâches trois jours, il redescend.</p><button class="pill" data-o="next">j’ai compris</button>`)); },
+  () => { ov.innerHTML = frame(sheetb(avatar({ t: zero, stage: 0, anim: false, id: 'o1' }).replace('viewBox="0 0 240 290"', 'viewBox="20 8 200 278"'), `<p class="p" style="margin-top:0"><b>ton perso part de zéro.</b> il est mou, il se tient mal, il n’a rien construit.</p><p class="p"><b>tu fais tes pompes, il prend du muscle.</b> tu bosses sur ton business, son socle monte. tu lâches trois jours, il redescend.</p><button class="pill" data-o="next">j’ai compris</button>`)); },
   () => { ov.innerHTML = frame(sheetb(`<svg viewBox="0 0 200 150"><ellipse cx="100" cy="132" rx="80" ry="10" fill="#111"/>${cube(70, 74, 40)}<g opacity=".55"><rect x="138" y="92" width="26" height="42" rx="6" fill="#0c0c0c" stroke="#777" stroke-width="2"/><rect x="142" y="97" width="18" height="30" rx="3" fill="#555"/></g></svg>`, `<div class="w h2" style="margin-bottom:6px">les règles</div>${RULES()}<p class="p" style="margin-top:14px"><b>rater un jour, ça arrive.</b> deux de suite, ta série repart à zéro.</p><button class="pill" data-o="next">continuer</button>`)); },
-  () => { ov.innerHTML = frame(sheetb(avatar({ t: mid, stage: 3, anim: false, id: 'o2', mood: 'c' }).replace('viewBox="0 0 240 290"', 'viewBox="20 40 200 250"'), `<div class="w h2">comment il s’appelle ?</div><p class="p" style="margin:10px 0 14px">tu pourras le changer plus tard.</p><input class="inp w" id="oname" maxlength="20" value="${esc(name)}" style="font-size:22px;margin-bottom:14px" autocomplete="off"><button class="pill" data-o="name">continuer</button>`)); setTimeout(() => { const i = $('#oname'); if (i) i.focus(); }, 500); },
+  () => { ov.innerHTML = frame(sheetb(avatar({ t: mid, stage: 3, anim: false, id: 'o2', mood: 'c' }).replace('viewBox="0 0 240 290"', 'viewBox="20 8 200 278"'), `<div class="w h2">comment il s’appelle ?</div><p class="p" style="margin:10px 0 14px">ton prénom, un surnom, ce que tu veux. tu pourras le changer plus tard.</p><input class="inp w" id="oname" maxlength="20" value="${replay ? esc(name) : ''}" placeholder="prénom ou surnom" style="font-size:20px;margin-bottom:14px" autocomplete="off"><button class="pill" data-o="name">continuer</button>`)); setTimeout(() => { const i = $('#oname'); if (i) i.focus(); }, 500); },
   () => renderMis(),
   () => { ov.innerHTML = frame(`<div class="sheetb"><div class="solo"><svg width="56" height="56" viewBox="0 0 56 56" style="display:block;margin-bottom:22px"><circle cx="28" cy="28" r="22" fill="none" stroke="#3a3a3a" stroke-width="5"/><g class="spin-r" style="transform-origin:28px 28px"><path d="M28 6a22 22 0 0 1 22 22" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/></g></svg><div class="w h2">mettre les choses en place</div></div></div>`); setTimeout(next, 2200); },
   () => { ov.innerHTML = frame(`<div class="sheetb"><div class="tx" style="background:#1b1b1b"><div class="w h2">configuration terminée</div><p class="p">passons à l’action en commençant ta première journée.</p><div class="prow"><button class="pill g" data-o="demo">voir la démo</button><button class="pill" data-o="go">commencer</button></div></div></div>`); }];
@@ -820,7 +846,7 @@ function onboarding(replay) {
  }
  const h = e => { const b = e.target.closest('[data-o]'); if (!b) return; const o = b.dataset.o; buzz();
   if (o === 'next') next();
-  else if (o === 'name') { name = ($('#oname').value || '').trim().slice(0, 20) || 'max'; next(); }
+  else if (o === 'name') { const inp = $('#oname'), v = (inp.value || '').trim().slice(0, 20); if (!v) { inp.focus(); inp.placeholder = 'écris un nom'; inp.classList.add('need'); return; } name = v; next(); }
   else if (o === 'lib') { const n = LIB[+b.dataset.c][1][+b.dataset.j][0].toLowerCase(), at = ms.findIndex(m => m.n.toLowerCase() === n); if (at >= 0) ms.splice(at, 1); else if (ms.length < MAXM) ms.push(libM(+b.dataset.c, +b.dataset.j)); renderMis(); }
   else if (o === 'rm') { const at = ms.findIndex(m => m.id === b.dataset.id); if (at >= 0) ms.splice(at, 1); renderMis(); }
   else if (o === 'cst') { cst = b.dataset.k; renderMis(); }
@@ -844,6 +870,7 @@ function boot() {
  memo = null; checkLevels(); render();
 }
 if (S && S.missions && S.start) boot(); else { S = null; onboarding(false); }
+setTimeout(() => { const bt = document.getElementById('boot'); if (bt) { bt.style.opacity = '0'; setTimeout(() => bt.remove(), 400); } }, 350);
 if (!HAS_CLAUDE) { try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {} if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {}); }
 startSync();
 })();
