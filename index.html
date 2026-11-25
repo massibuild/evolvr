@@ -92,7 +92,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .kpi{background:var(--s1);border-radius:22px;padding:14px 14px 12px}
 .kpi b{display:block;font-size:24px}
 .kpi span{font-size:13px;color:var(--mute);font-weight:600}
-.srow{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--ln)}
+.srow{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--ln)}
 .srow:last-child{border-bottom:0}
 .srow .t{display:flex;justify-content:space-between;gap:8px;margin-bottom:7px;font-weight:600}
 .srow .lvn{font-size:20px;text-align:right;min-width:48px}
@@ -187,7 +187,7 @@ label.l{display:block;font-size:13px;font-weight:600;color:var(--mute);margin:14
 .tl{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px}
 .tl div{text-align:center;background:var(--s1);border-radius:20px;padding:6px 4px 10px}
 .tl svg{width:100%;height:150px}
-.tots{display:grid;grid-template-columns:repeat(auto-fit,minmax(9em,1fr));gap:10px}
+.tots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .ach{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 .ach div{text-align:center;font-size:13px;font-weight:600;line-height:1.2}
 .ach svg{width:100%;max-width:70px;aspect-ratio:1;display:block;margin:0 auto 6px}
@@ -306,28 +306,28 @@ const hm = m => m >= 60 ? `${Math.floor(m/60)}h${m%60 ? pad(Math.round(m%60)) : 
 
 /* ---------- modèle ---------- */
 const STATS = [
- {k:'force', n:'force', sub:'muscu · pompes'},
- {k:'cardio', n:'cardio', sub:'pas · course'},
- {k:'build', n:'build', sub:'créer · bosser'},
- {k:'focus', n:'focus', sub:'deep work · lecture'},
+ {k:'corps', n:'corps', sub:'sport · pas · muscu'},
+ {k:'tete', n:'tête', sub:'lecture · deep work'},
  {k:'disc', n:'discipline', sub:'routines · sommeil'},
- {k:'chari', n:'charisme', sub:'appels · closing'}];
+ {k:'build', n:'build', sub:'taff · projets'}];
+const MXP = 30;
+const STAT_MAP = { force: 'corps', cardio: 'corps', focus: 'tete', chari: 'build', disc: 'disc', build: 'build', corps: 'corps', tete: 'tete' };
 const SN = Object.fromEntries(STATS.map(s => [s.k, s.n]));
 const ALL = [0,1,2,3,4,5,6];
 const DEF_M = () => [
- {id:'pompes', n:'100 pompes', type:'check', stat:'force', xp:40, days:ALL.slice()},
- {id:'muscu', n:'séance muscu', type:'check', stat:'force', xp:60, days:[1,3,5]},
- {id:'pas', n:'8 000 pas', type:'check', stat:'cardio', xp:35, days:ALL.slice()},
- {id:'appels', n:'appels de prospection', type:'check', stat:'chari', xp:45, days:[1,2,3,4,5]},
- {id:'lecture', n:'lecture 20 min', type:'check', stat:'focus', xp:25, days:ALL.slice()},
- {id:'noscroll', n:'zéro scroll avant midi', type:'check', stat:'disc', xp:30, days:ALL.slice()},
- {id:'dodo', n:'couché avant 1h', type:'check', stat:'disc', xp:30, days:ALL.slice()}];
+ {id:'pompes', n:'100 pompes', type:'check', stat:'corps', days:ALL.slice()},
+ {id:'muscu', n:'séance de sport', type:'check', stat:'corps', days:[1,3,5]},
+ {id:'pas', n:'8 000 pas', type:'check', stat:'corps', days:ALL.slice()},
+ {id:'lecture', n:'lecture 20 min', type:'check', stat:'tete', days:ALL.slice()},
+ {id:'projet', n:'1h sur mon projet', type:'check', stat:'build', days:[1,2,3,4,5]},
+ {id:'noscroll', n:'zéro scroll avant midi', type:'check', stat:'disc', days:ALL.slice()},
+ {id:'dodo', n:'couché avant minuit', type:'check', stat:'disc', days:ALL.slice()}];
 const LIB = [
- ['corps', [['100 pompes', 'force', 40], ['séance de sport', 'force', 60], ['8 000 pas', 'cardio', 35], ['20 min de course', 'cardio', 40], ['10 min d’étirements', 'force', 20]]],
- ['tête', [['lecture 20 min', 'focus', 25], ['10 min de méditation', 'focus', 25], ['1h de deep work', 'focus', 40], ['apprendre un truc nouveau', 'focus', 30]]],
- ['discipline', [['zéro scroll avant midi', 'disc', 30], ['couché avant minuit', 'disc', 30], ['réveil sans snooze', 'disc', 25], ['lit fait le matin', 'disc', 15], ['boire 2 l d’eau', 'disc', 20]]],
- ['projets & social', [['1h sur mon projet', 'build', 40], ['publier un contenu', 'build', 30], ['prospection', 'chari', 45], ['appeler un proche', 'chari', 25]]]];
-const libM = (c, j) => { const [n, stat, xp] = LIB[c][1][j]; return { id: uid(), n, type: 'check', stat, xp, days: ALL.slice() }; };
+ ['corps', [['100 pompes', 'corps'], ['séance de sport', 'corps'], ['8 000 pas', 'corps'], ['20 min de course', 'corps'], ['10 min d’étirements', 'corps']]],
+ ['tête', [['lecture 20 min', 'tete'], ['10 min de méditation', 'tete'], ['1h de deep work', 'tete'], ['apprendre un truc nouveau', 'tete'], ['appeler un proche', 'tete']]],
+ ['discipline', [['zéro scroll avant midi', 'disc'], ['couché avant minuit', 'disc'], ['réveil sans snooze', 'disc'], ['lit fait le matin', 'disc'], ['boire 2 l d’eau', 'disc']]],
+ ['build', [['1h sur mon projet', 'build'], ['publier un contenu', 'build'], ['prospection', 'build'], ['2h de taff concentré', 'build']]]];
+const libM = (c, j) => { const [n, stat] = LIB[c][1][j]; return { id: uid(), n, type: 'check', stat, days: ALL.slice() }; };
 const STAGES = ['npc','rookie','grinder','builder','operator','titan','légende'];
 const STAGE_AT = [1,2,4,6,9,14,20];
 const MATS = [['argile','#8e8e8e','#474747'],['graphite','#a6a6a6','#545454'],['acier','#c3c3c3','#676767'],['aluminium','#dcdcdc','#828282'],['titane','#ececec','#9a9a9a'],['céramique','#f8f8f8','#b9b9b9'],['lumière','#ffffff','#d4d4d4']];
@@ -353,12 +353,12 @@ function dayCalc(k) {
  let mis = 0, done = 0; const ms = [];
  S.missions.forEach(m => {
   if (m.off || !m.days.includes(wd)) return;
-  const on = !!(d.m && d.m[m.id]), x = on ? m.xp : 0;
-  xp[m.stat] += x; mis += x; if (on) done++; ms.push({ m, on, x });
+  const on = !!(d.m && d.m[m.id]), x = on ? MXP : 0, st = STAT_MAP[m.stat] || 'disc';
+  xp[st] += x; mis += x; if (on) done++; ms.push({ m, on, x });
  });
  xp.build += bx;
- const possible = ms.reduce((a, x) => a + x.m.xp, 0) + BAL_XP, G = Math.max(30, Math.round(req() * possible / 10) * 10), sum = mis + bx;
- return { k, xp, sum, bal, bx, mis, done, ms, G, possible, comp: clamp(sum / G, 0, 1), valid: sum >= G, perfect: ms.length > 0 && done === ms.length, d };
+ const n = ms.length, G = n ? Math.max(1, Math.round(req() * n)) : 0;
+ return { k, xp, sum: mis + bx, bal, bx, mis, done, ms, n, G, rest: !n, comp: n ? clamp(done / G, 0, 1) : 0, valid: n > 0 && done >= G, perfect: n > 0 && done === n, d };
 }
 const thS = L => 40 * Math.pow(L - 1, 1.7);
 const lvS = x => clamp(Math.floor(1 + Math.pow(Math.max(0, x) / 40, 1 / 1.7)), 1, 99);
@@ -376,7 +376,7 @@ function compute(upto) {
  for (let k = S.start, i = 0; k <= upto && i < 3000; k = addD(k, 1), i++) {
   const b = dayCalc(k);
   STATS.forEach(s => { xp[s.k] = Math.max(0, xp[s.k] + b.xp[s.k]); if (b.xp[s.k] >= 5) last[s.k] = k; });
-  if (b.valid) { A.validDays++; run++; miss = 0; A.best = Math.max(A.best, run); } else if (k < T && ++miss >= 2) run = 0;
+  if (b.valid) { A.validDays++; run++; miss = 0; A.best = Math.max(A.best, run); } else if (!b.rest && k < T && ++miss >= 2) run = 0;
   A.missions += b.done; if (b.perfect) A.perfect++; if (b.bal === 1) A.buildDays++; if (b.bal === -1) A.consoDays++;
   if (k < T) STATS.forEach(s => { if (act.has(s.k) && diffD(last[s.k], k) >= 3) xp[s.k] *= .975; });
  }
@@ -384,16 +384,17 @@ function compute(upto) {
  STATS.forEach(s => { const L = lvS(xp[s.k]); lv[s.k] = L; t[s.k] = 1 - Math.pow(1 - clamp((L - 1 + (xp[s.k] - thS(L)) / (thS(L + 1) - thS(L))) / 24, 0, 1), 1.8);
   prog[s.k] = (xp[s.k] - thS(L)) / (thS(L + 1) - thS(L)); total += xp[s.k]; });
  const glv = lvG(total), stage = stageOf(glv);
- return { xp, last, lv, t, prog, total, glv, stage, gp: (total - thG(glv)) / (thG(glv + 1) - thG(glv)), gnext: thG(glv + 1), A };
+ const av = { force: t.corps, cardio: t.corps * .6, focus: t.tete, disc: t.disc, build: t.build, chari: 0 };
+ return { xp, last, lv, t, av, prog, total, glv, stage, gp: (total - thG(glv)) / (thG(glv + 1) - thG(glv)), gnext: thG(glv + 1), A };
 }
 let memo = null;
 const C = () => memo || (memo = compute(todayK()));
 function streak() {
  const T = todayK(); let k = dayCalc(T).valid ? T : addD(T, -1), n = 0, miss = 0;
- for (let i = 0; k >= S.start && i < 3000; i++, k = addD(k, -1)) { if (dayCalc(k).valid) { n++; miss = 0; } else if (++miss >= 2) break; }
+ for (let i = 0; k >= S.start && i < 3000; i++, k = addD(k, -1)) { const b = dayCalc(k); if (b.valid) { n++; miss = 0; } else if (!b.rest && ++miss >= 2) break; }
  return n;
 }
-const danger = () => { const T = todayK(), y = addD(T, -1); return y >= S.start && !dayCalc(T).valid && !dayCalc(y).valid && streak() > 0; };
+const danger = () => { const T = todayK(), y = addD(T, -1), by = y >= S.start ? dayCalc(y) : null; return by && !by.rest && !by.valid && !dayCalc(T).valid && streak() > 0; };
 const editable = k => k >= addD(todayK(), -1);
 const moodOf = b => b.bal === -1 ? 'k' : b.bal === 1 ? 'c' : 'n';
 
@@ -403,12 +404,11 @@ function cube(x, y, s) {
  return `<g><path d="M${x} ${y-s}L${x+s} ${y-s+h}L${x} ${y-s+2*h}L${x-s} ${y-s+h}Z" fill="url(#cT)"/><path d="M${x-s} ${y-s+h}L${x} ${y-s+2*h}L${x} ${y+s}L${x-s} ${y+s-h}Z" fill="url(#cL)"/><path d="M${x+s} ${y-s+h}L${x} ${y-s+2*h}L${x} ${y+s}L${x+s} ${y+s-h}Z" fill="url(#cR)"/></g>`;
 }
 const ICON = {
- force: `<svg viewBox="0 0 32 32"><rect x="8" y="14.3" width="16" height="3.4" rx="1.7" fill="url(#gM)"/><rect x="3.5" y="8" width="5.5" height="16" rx="2.4" fill="url(#gW)"/><rect x="23" y="8" width="5.5" height="16" rx="2.4" fill="url(#gM)"/><rect x="1" y="11.5" width="3" height="9" rx="1.5" fill="url(#gD)"/><rect x="28" y="11.5" width="3" height="9" rx="1.5" fill="url(#gD)"/></svg>`,
- cardio: `<svg viewBox="0 0 32 32"><path d="M16 27.5C9 22.4 3.5 18 3.5 11.6 3.5 7.6 6.6 4.8 10.2 4.8c2.6 0 4.6 1.4 5.8 3.4 1.2-2 3.2-3.4 5.8-3.4 3.6 0 6.7 2.8 6.7 6.8 0 6.4-5.5 10.8-12.5 15.9Z" fill="url(#gW)"/><path d="M5 15.5h6l2-4 3.4 8 2.2-4.5H27" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+ corps: `<svg viewBox="0 0 32 32"><rect x="8" y="14.3" width="16" height="3.4" rx="1.7" fill="url(#gM)"/><rect x="3.5" y="8" width="5.5" height="16" rx="2.4" fill="url(#gW)"/><rect x="23" y="8" width="5.5" height="16" rx="2.4" fill="url(#gM)"/><rect x="1" y="11.5" width="3" height="9" rx="1.5" fill="url(#gD)"/><rect x="28" y="11.5" width="3" height="9" rx="1.5" fill="url(#gD)"/></svg>`,
  build: `<svg viewBox="0 0 32 32">${cube(16, 16, 12)}</svg>`,
- focus: `<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#gD)"/><circle cx="16" cy="16" r="9" fill="url(#gW)"/><circle cx="16" cy="16" r="4.6" fill="#141414"/><circle cx="14.6" cy="14.6" r="1.4" fill="#fff"/></svg>`,
- disc: `<svg viewBox="0 0 32 32"><path d="M16 3 27 7v8.2c0 6.7-4.6 11.4-11 13.8C9.6 26.6 5 21.9 5 15.2V7Z" fill="url(#gW)"/><path d="M16 3v26C9.6 26.6 5 21.9 5 15.2V7Z" fill="#fff" opacity=".35"/><path d="m10.8 15.8 3.6 3.6 7-7.4" fill="none" stroke="#1a1a1a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
- chari: `<svg viewBox="0 0 32 32"><path d="M4 12.5h5l9-6v19l-9-6H4Z" fill="url(#gW)"/><rect x="5" y="19" width="4" height="7" rx="1.6" fill="url(#gM)"/><path d="M22 11.5a6.4 6.4 0 0 1 0 9M25.4 8.2a11 11 0 0 1 0 15.6" fill="none" stroke="url(#gM)" stroke-width="2.4" stroke-linecap="round"/></svg>`};
+ tete: `<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#gD)"/><circle cx="16" cy="16" r="9" fill="url(#gW)"/><circle cx="16" cy="16" r="4.6" fill="#141414"/><circle cx="14.6" cy="14.6" r="1.4" fill="#fff"/></svg>`,
+ disc: `<svg viewBox="0 0 32 32"><path d="M16 3 27 7v8.2c0 6.7-4.6 11.4-11 13.8C9.6 26.6 5 21.9 5 15.2V7Z" fill="url(#gW)"/><path d="M16 3v26C9.6 26.6 5 21.9 5 15.2V7Z" fill="#fff" opacity=".35"/><path d="m10.8 15.8 3.6 3.6 7-7.4" fill="none" stroke="#1a1a1a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`};
+
 const g = v => `rgb(${v},${v},${v})`;
 const hx2 = h => parseInt(h.slice(1, 3), 16);
 const mixG = (a, b, t) => g(Math.round(hx2(a) + (hx2(b) - hx2(a)) * clamp(t, 0, 1)));
@@ -462,7 +462,7 @@ const ACH = [
  {n:'niveau 10', d:'niveau global', f:(A,c) => c.glv >= 10},
  {n:'titan', d:'rang titan', f:(A,c) => c.stage >= 5},
  {n:'légende', d:'rang légende', f:(A,c) => c.stage >= 6},
- {n:'niveau 50', d:'niveau global', f:(A,c) => c.glv >= 50}];
+ {n:'niveau 30', d:'niveau global', f:(A,c) => c.glv >= 30}];
 
 /* ---------- persistance ---------- */
 const sync = { db: null, uid: null, state: 'local', dirty: new Set(), busy: false, t: 0 };
@@ -521,7 +521,7 @@ async function startSync() {
 function fresh(name, missions) {
  const T = todayK();
  memo = null;
- S = { v: 1, name: name || 'toi', start: T, set: { cut: 4, req: .7 }, v3: 1, v4: 1, missions, days: {}, demo: false, seen: null, upd: Date.now() };
+ S = { v: 1, name: name || 'toi', start: T, set: { cut: 4, req: .7 }, v3: 1, v4: 1, v5: 1, missions, days: {}, demo: false, seen: null, upd: Date.now() };
 }
 function demo() {
  const name = S ? S.name : 'max', missions = S && S.missions.length ? S.missions : DEF_M();
@@ -545,21 +545,21 @@ const snapshotLv = c => ({ ...c.lv, g: c.glv, st: c.stage });
 const OQ = [];
 function showOver(html) { OQ.push(html); if (!$('#over').innerHTML) nextOver(); }
 function nextOver() { $('#over').innerHTML = OQ.shift() || ''; if ($('#over').innerHTML) buzz(); }
-const overHtml = (c, kicker, title, sub) => `<div class="full"><div class="blob"></div><div class="ob"><div style="flex:1;display:flex;align-items:center;justify-content:center;padding-top:40px"><div class="av pop lvav" style="height:min(46vh,360px)">${avatar({ t: c.t, stage: c.stage, mood: 'c', id: 'lu' + OQ.length })}</div></div>
+const overHtml = (c, kicker, title, sub) => `<div class="full"><div class="blob"></div><div class="ob"><div style="flex:1;display:flex;align-items:center;justify-content:center;padding-top:40px"><div class="av pop lvav" style="height:min(46vh,360px)">${avatar({ t: c.av, stage: c.stage, mood: 'c', id: 'lu' + OQ.length })}</div></div>
   <div style="padding:0 28px calc(34px + env(safe-area-inset-bottom,0px))"><div class="mute blur-in" style="font-weight:600">${kicker}</div><div class="w lvbig blur-in" style="margin:6px 0 10px">${esc(title)}</div><p class="p blur-in" style="margin-bottom:24px">${sub}</p><button class="pill" data-a="closeover">continuer</button></div></div></div>`;
 function checkLevels() {
  const c = C(); const now = snapshotLv(c), T = todayK();
  if (!S.seen) { S.seen = now; S.goalDay = dayCalc(T).valid ? T : null; saveLocal(); return; }
  const b = dayCalc(T);
- if (b.valid && S.goalDay !== T) { S.goalDay = T; if (b.perfect) S.perfDay = T; const st = streak(); setTimeout(() => showOver(overHtml(c, b.perfect ? 'journée parfaite' : 'objectif atteint', `série ${st} j`, `<b>+${fmt(b.sum)} xp aujourd’hui.</b> reviens demain pour garder ta série.`)), 350); }
+ if (b.valid && S.goalDay !== T) { S.goalDay = T; if (b.perfect) S.perfDay = T; const st = streak(); setTimeout(() => showOver(overHtml(c, b.perfect ? 'journée parfaite' : 'objectif atteint', `série ${st} j`, `<b>${b.done}/${b.n} missions validées.</b> reviens demain pour garder ta série.`)), 350); }
  else if (b.perfect && b.valid && S.perfDay !== T && S.goalDay === T) { S.perfDay = T; setTimeout(() => showOver(overHtml(c, 'journée parfaite', 'tout validé', '<b>toutes tes missions du jour sont faites.</b> rien à redire.')), 350); }
  let best = null; const up = STATS.filter(s => now[s.k] > (S.seen[s.k] || 1));
  if (now.st > S.seen.st) best = { type: 'stage' }; else if (now.g > S.seen.g) best = { type: 'glob' };
  S.seen = now; saveLocal();
  if (best) setTimeout(() => levelUp(best, c), 450);
- else if (up.length) setTimeout(() => toast(`${up[0].n} niveau ${now[up[0].k]} · ${LVTXT[up[0].k]}`), 600);
+ else if (up.length) setTimeout(() => toast(`${up[0].n} · ${LVTXT[up[0].k]}`), 600);
 }
-const LVTXT = { force: 'il s’épaissit.', cardio: 'il s’affine.', build: 'son socle monte d’un cran.', focus: 'sa tête s’éclaire.', disc: 'il se tient plus droit.', chari: 'son aura s’étend.' };
+const LVTXT = { corps: 'il s’épaissit.', tete: 'sa tête s’éclaire.', disc: 'il se tient plus droit.', build: 'son socle monte d’un cran.' };
 function levelUp(b, c) {
  const title = b.type === 'stage' ? `rang ${STAGES[c.stage]}` : b.type === 'glob' ? `niveau ${c.glv}` : `${SN[b.k]} ${c.lv[b.k]}`;
  const sub = b.type === 'stage' ? `nouveau matériau : ${MATS[c.stage][0]}. ${STAGE_TXT[c.stage]}` : b.type === 'glob' ? 'ton perso passe un cap.' : LVTXT[b.k];
@@ -567,10 +567,12 @@ function levelUp(b, c) {
 }
 
 /* ---------- vues ---------- */
-const RULES = () => `<div class="rule"><b class="w num">+xp</b><span><b>chaque mission validée.</b> sa stat monte.</span></div><div class="rule"><b class="w num">±${BAL_XP}</b><span><b>ta balance, au bilan du soir (dès ${BAL_H}h).</b> ton temps est surtout allé à construire ? +${BAL_XP}. à consommer ? −${BAL_XP}.</span></div><div class="rule"><b class="w num">${Math.round(req() * 100)}%</b><span><b>ton objectif du jour.</b> ${Math.round(req() * 100)} % de l’xp possible ce jour-là. atteins-le pour faire monter ta série.</span></div>`;
-const rec = b => [['missions', b.mis], ['balance', b.bx]].map(([l, v]) => `<div class="rc"><span>${l}</span><b class="num ${v < 0 ? 'neg' : ''}">${v < 0 ? '−' : '+'}${fmt(Math.abs(v))}</b></div>`).join('');
+const RULES = () => `<div class="rule"><b class="w num">+${MXP}</b><span><b>xp par mission validée.</b> la stat de la mission monte.</span></div><div class="rule"><b class="w num">±${BAL_XP}</b><span><b>au bilan du soir (dès ${BAL_H}h).</b> ton temps est surtout allé à construire ? +${BAL_XP}. à consommer ? −${BAL_XP}.</span></div><div class="rule"><b class="w num">${Math.round(req() * 100)}%</b><span><b>de tes missions du jour = objectif atteint.</b> ta série monte d’un jour.</span></div>`;
+const rec = b => [['missions', b.mis], ['bilan du soir', b.bx]].map(([l, v]) => `<div class="rc"><span>${l}</span><b class="num ${v < 0 ? 'neg' : ''}">${v < 0 ? '−' : '+'}${fmt(Math.abs(v))} xp</b></div>`).join('');
+const left = b => Math.max(0, b.G - b.done);
+const plural = (n, w) => `${n} ${w}${n > 1 ? 's' : ''}`;
 function hint(c, b) {
- const T = todayK(), G = b.G, next = b.ms.find(x => !x.on), lock = balLocked(T);
+ const T = todayK(), next = b.ms.find(x => !x.on), lock = balLocked(T);
  const act = activeStats(), atro = diffD(S.start, T) >= 3 ? STATS.find(s => act.has(s.k) && diffD(c.last[s.k], T) >= 3) : null;
  if (b.valid && b.perfect) return 'journée parfaite. rien à redire.';
  if (b.valid) return 'objectif atteint. je me sens plus fort, merci.';
@@ -579,41 +581,41 @@ function hint(c, b) {
  if (b.bal === -1) return 'journée côté conso. on renverse la balance ?';
  if (b.bal == null && !lock) return 'le bilan du soir est ouvert. aujourd’hui, ton temps est surtout allé où ?';
  if (atro) return `ma stat ${atro.n} redescend : ${diffD(c.last[atro.k], T)} jours sans.${next && next.m.stat === atro.k ? ` on fait ${next.m.n} ?` : ''}`;
- if (b.sum <= 0) return next ? `on commence par quoi ? ${next.m.n} ?` : 'dis-moi vers où penche ta journée.';
- return `encore ${fmt(G - b.sum)} xp.${next ? ` prochaine étape : ${next.m.n}.` : ''}`;
+ if (b.rest) return 'pas de mission aujourd’hui. repos, ou ajoute-en une.';
+ if (!b.done) return next ? `on commence par quoi ? ${next.m.n} ?` : 'dis-moi vers où penche ta journée.';
+ return `encore ${plural(left(b), 'mission')}.${next ? ` prochaine : ${next.m.n}.` : ''}`;
 }
 function todayCard(b, st) {
- const G = b.G;
  return `<button class="card today" data-a="tab" data-t="jour"><div class="row" style="display:flex;justify-content:space-between;font-weight:600"><span class="mute">aujourd’hui</span><span class="${danger() ? 'red' : 'mute'}">${danger() ? 'série en danger · ' : 'série '}<b style="color:var(--ink)" class="num">${st} j</b></span></div>
-  <div class="w num big2">${fmt(b.sum)} <small>/ ${fmt(G)} xp</small></div><div class="bar"><i style="width:${(b.comp * 100).toFixed(1)}%"></i></div>
-  <div class="ft"><span>${b.valid ? 'objectif atteint' : `encore ${fmt(G - b.sum)} xp`}</span><span style="color:var(--ink)">voir ›</span></div></button>`;
+  <div class="w num big2">${b.done} <small>/ ${b.n} missions</small></div><div class="bar"><i style="width:${(b.n ? b.done / b.n * 100 : 0).toFixed(1)}%"></i></div>
+  <div class="ft"><span>${b.rest ? 'jour de repos' : b.valid ? (b.perfect ? 'journée parfaite' : 'objectif atteint') : `objectif : ${b.G} · encore ${left(b)}`}</span><span style="color:var(--ink)">voir ›</span></div></button>`;
 }
 function vMoi() {
  const c = C(), T = todayK(), b = dayCalc(T), st = streak(), md = moodOf(b);
  const nx = STAGE_AT[c.stage + 1];
- let h = `<section class="hero"><div class="say"><span>${esc(hint(c, b))}</span></div><div class="av">${avatar({ t: c.t, stage: c.stage, mood: md, id: 'main' })}</div>
+ let h = `<section class="hero"><div class="say"><span>${esc(hint(c, b))}</span></div><div class="av">${avatar({ t: c.av, stage: c.stage, mood: md, id: 'main' })}</div>
   <div class="who"><div><div class="w h1">${esc(S.name)}</div><div class="mute" style="font-weight:600;margin-top:4px">${STAGES[c.stage]} · ${MATS[c.stage][0]}</div></div><div class="lv"><b class="w num">${c.glv}</b><span class="sm mute">niveau</span></div></div>
-  <div class="bar" style="margin-top:14px"><i style="width:${(c.gp * 100).toFixed(1)}%"></i></div><div class="sm mute num" style="display:flex;justify-content:space-between;margin-top:6px"><span>${fmt(c.total)} xp</span><span>${nx ? `prochain : ${STAGES[c.stage + 1]} · ${MATS[c.stage + 1][0]} au niv. ${nx}` : 'rang max'}</span></div></section>`;
+  <div class="bar" style="margin-top:14px"><i style="width:${(c.gp * 100).toFixed(1)}%"></i></div><div class="sm mute" style="margin-top:6px">${nx ? `prochain rang : ${STAGES[c.stage + 1]} · ${MATS[c.stage + 1][0]}, au niveau ${nx}` : 'rang max atteint'}</div></section>`;
  h += todayCard(b, st);
- h += `<div class="sec"><div class="sech"><span class="w h3">stats</span><span class="sm mute">+xp aujourd’hui</span></div><div class="card" style="padding:6px 14px">`;
+ h += `<div class="sec"><div class="sech"><span class="w h3">stats</span></div><div class="card" style="padding:6px 14px">`;
  const act = activeStats();
  STATS.forEach(s => {
   const on = act.has(s.k), idle = diffD(c.last[s.k], T), atro = on && idle >= 3 && diffD(S.start, T) >= 3, dx = Math.round(b.xp[s.k]);
-  h += `<div class="srow" style="${on ? '' : 'opacity:.45'}"><div class="ic">${ICON[s.k]}</div><div><div class="t"><span>${s.n}</span><span class="sm ${atro || dx < 0 ? 'red' : 'mute'}">${!on ? 'aucune mission' : atro ? `redescend · ${idle} j sans` : dx > 0 ? `+${dx}` : dx < 0 ? `−${-dx}` : s.sub}</span></div><div class="bar ${atro ? 'r' : ''}"><i style="width:${(c.prog[s.k] * 100).toFixed(1)}%"></i></div></div><div class="w lvn num">${c.lv[s.k]}</div></div>`;
+  h += `<div class="srow" style="${on ? '' : 'opacity:.45'}"><div class="ic">${ICON[s.k]}</div><div><div class="t"><span>${s.n}</span><span class="sm ${atro || dx < 0 ? 'red' : 'mute'}">${!on ? 'aucune mission' : atro ? `redescend · ${idle} j sans` : dx > 0 ? `+${dx}` : dx < 0 ? `−${-dx}` : s.sub}</span></div><div class="bar ${atro ? 'r' : ''}"><i style="width:${(c.prog[s.k] * 100).toFixed(1)}%"></i></div></div></div>`;
  });
- h += `</div></div><div class="sec"><div class="sech"><span class="w h3">comment gagner de l’xp</span></div><div class="card" style="padding:4px 16px 14px">${RULES()}<p class="p sm" style="margin-top:12px"><b>rater un jour, ça arrive.</b> deux jours de suite, ta série repart à zéro. une stat que tu ne travailles pas pendant 3 jours redescend doucement.</p></div></div>`;
+ h += `</div></div><div class="sec"><div class="sech"><span class="w h3">les règles</span></div><div class="card" style="padding:4px 16px 14px">${RULES()}<p class="p sm" style="margin-top:12px"><b>rater un jour, ça arrive.</b> deux de suite, ta série repart à zéro. une stat pas travaillée pendant 3 jours redescend doucement.</p></div></div>`;
  return h;
 }
 function ringSvg(f) { const R = 52, L = 2 * Math.PI * R; return `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="${R}" fill="none" stroke="#222" stroke-width="10"/><circle cx="60" cy="60" r="${R}" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-dasharray="${(L * clamp(f, 0, 1)).toFixed(1)} ${L.toFixed(1)}"/></svg>`; }
 function vJour() {
- const T = todayK(), k = ui.day || T, b = dayCalc(k), G = b.G, ed = editable(k);
+ const T = todayK(), k = ui.day || T, b = dayCalc(k), ed = editable(k);
  let h = `<div class="dnav"><button class="ib" data-a="dprev" aria-label="jour précédent" ${k <= S.start ? 'disabled' : ''}>‹</button><div style="text-align:center"><div class="w h3">${k === T ? 'aujourd’hui' : k === addD(T, -1) ? 'hier' : dLabel(k)}</div><div class="sm mute">${dLabel(k)}</div></div><button class="ib" data-a="dnext" aria-label="jour suivant" ${k >= T ? 'disabled' : ''}>›</button></div>`;
- h += `<div class="card dayhead"><div class="ring">${ringSvg(b.comp)}<b class="w num rtx">${fmt(b.sum)}<span>/ ${fmt(G)} xp</span></b></div><div><div class="w h3" style="margin-bottom:6px">${b.valid ? 'objectif atteint' : `encore ${fmt(G - b.sum)} xp`}</div>${rec(b)}</div></div>`;
- h += `<div class="sec"><div class="sech"><span class="w h3">missions</span><span class="sm mute">${b.done}/${b.ms.length} validées</span></div>${ed ? '' : '<p class="p sm" style="margin:0 4px 10px">jour passé : lecture seule. tu peux modifier aujourd’hui et hier.</p>'}`;
+ h += `<div class="card dayhead"><div class="ring">${ringSvg(b.comp)}<b class="w num rtx">${b.done}/${b.n}<span>missions</span></b></div><div><div class="w h3" style="margin-bottom:6px">${b.rest ? 'jour de repos' : b.valid ? (b.perfect ? 'journée parfaite' : 'objectif atteint') : `encore ${plural(left(b), 'mission')}`}</div><p class="p sm" style="margin:0 0 8px">${b.rest ? 'aucune mission prévue.' : `objectif : ${b.G} sur ${b.n} missions.`}</p>${rec(b)}</div></div>`;
+ h += `<div class="sec"><div class="sech"><span class="w h3">missions</span><span class="sm mute">+${MXP} xp chacune</span></div>${ed ? '' : '<p class="p sm" style="margin:0 4px 10px">jour passé : lecture seule. tu peux modifier aujourd’hui et hier.</p>'}`;
  if (!b.ms.length) h += `<div class="card p">aucune mission ce jour-là.</div>`;
  const tick = '<svg width="20" height="20" viewBox="0 0 20 20"><path d="m4.5 10.5 3.6 3.6 7.4-8" fill="none" stroke="#000" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
  b.ms.forEach(({ m, on }) => {
-  h += `<div class="mis ${on ? 'on' : ''} ${ed ? '' : 'ro'}" ${ed ? `data-a="tog" data-id="${m.id}" role="button" tabindex="0"` : ''} aria-pressed="${on}"><div class="ic">${ICON[m.stat]}</div><div><div class="mn">${esc(m.n)}</div><div class="ms">+${m.xp} xp ${SN[m.stat]}</div></div><span class="chk ${on ? 'on' : ''}">${on ? tick : ''}</span></div>`;
+  h += `<div class="mis ${on ? 'on' : ''} ${ed ? '' : 'ro'}" ${ed ? `data-a="tog" data-id="${m.id}" role="button" tabindex="0"` : ''} aria-pressed="${on}"><div class="ic">${ICON[STAT_MAP[m.stat]] || ICON.disc}</div><div><div class="mn">${esc(m.n)}</div><div class="ms">${SN[STAT_MAP[m.stat]] || ''}</div></div><span class="chk ${on ? 'on' : ''}">${on ? tick : ''}</span></div>`;
  });
  h += `${ed ? '<button class="pill o sm" style="width:100%;margin-top:4px" data-a="missions">modifier mes missions</button>' : ''}</div>` + balCard(k, b);
  return h;
@@ -650,31 +652,15 @@ function regCard(T) {
 }
 function vEvo() {
  const c = C(), T = todayK(), A = c.A, age = diffD(S.start, T);
- let h = `<div class="w h1" style="margin:6px 4px 4px">évolution</div><p class="p" style="margin:0 4px 18px"><b>${age + 1} jour${age ? 's' : ''} de jeu.</b> ${fmt(c.total)} xp, ${A.validDays} objectifs atteints, meilleure série ${A.best} j.</p>`;
+ let h = `<div class="w h1" style="margin:6px 4px 4px">évolution</div><p class="p" style="margin:0 4px 18px"><b>${age + 1} jour${age ? 's' : ''} de jeu.</b> ${A.validDays} objectif${A.validDays > 1 ? 's' : ''} atteint${A.validDays > 1 ? 's' : ''}.</p>`;
  const steps = [56, 28, 14, 0].filter(n => n <= age);
  if (steps.length < 2 && age > 0) steps.unshift(age);
- h += `<div class="tl">${steps.map(n => { const cc = n ? compute(addD(T, -n)) : c; return `<div>${avatar({ t: cc.t, stage: cc.stage, anim: false, id: 'tl' + n })}<div class="sm" style="font-weight:700">${n ? `il y a ${n >= 7 && n % 7 === 0 ? (n / 7) + ' sem.' : n + ' j'}` : 'aujourd’hui'}</div><div class="sm mute">niv. ${cc.glv}</div></div>`; }).join('')}</div>`;
+ h += `<div class="tl">${steps.map(n => { const cc = n ? compute(addD(T, -n)) : c; return `<div>${avatar({ t: cc.av, stage: cc.stage, anim: false, id: 'tl' + n })}<div class="sm" style="font-weight:700">${n ? `il y a ${n >= 7 && n % 7 === 0 ? (n / 7) + ' sem.' : n + ' j'}` : 'aujourd’hui'}</div><div class="sm mute">niv. ${cc.glv}</div></div>`; }).join('')}</div>`;
  h += regCard(T);
- h += `<div class="sec card"><div class="sech" style="margin:0 0 6px"><span class="w h3">objectif par jour</span><span class="sm mute">14 jours</span></div><div class="fig" id="fmir"><svg></svg></div><p class="p sm" style="margin-top:8px">pointillés : l’objectif du jour. <b>barre blanche = objectif atteint.</b></p></div>`;
- h += `<div class="sec tots">${[[A.validDays, 'objectifs atteints'], [A.best + ' j', 'meilleure série'], [fmt(A.missions), 'missions validées'], [A.perfect, 'journées parfaites'], [A.buildDays, 'jours côté build'], [A.consoDays, 'jours côté conso']].map(([v, l]) => `<div class="kpi"><b class="w num">${v}</b><span>${l}</span></div>`).join('')}</div>`;
+ h += `<div class="sec tots">${[[A.best + ' j', 'meilleure série'], [fmt(A.missions), 'missions validées'], [A.buildDays, 'jours côté build']].map(([v, l]) => `<div class="kpi"><b class="w num">${v}</b><span>${l}</span></div>`).join('')}</div>`;
  h += `<div class="sec"><div class="sech"><span class="w h3">trophées</span><span class="sm mute">${ACH.filter(a => a.f(A, c)).length}/${ACH.length}</span></div><div class="card ach">${ACH.map((a, i) => { const on = a.f(A, c); return `<div class="${on ? '' : 'lk'}">${medal(on, i)}${esc(a.n)}<div class="mute" style="font-weight:500">${esc(a.d)}</div></div>`; }).join('')}</div></div>`;
  return h;
 }
-let roM = null;
-function drawEvo() {
- const fm = $('#fmir svg'); if (!fm) return;
- const T = todayK(); const days = []; for (let i = 13; i >= 0; i--) { const k = addD(T, -i); days.push(k >= S.start ? dayCalc(k) : { sum: 0, G: 1, k }); }
- const dm = () => { const W = fm.clientWidth, H = fm.clientHeight; if (!W) return; const mx = 1.3, base = H - 22, top = 8, sc = (base - top) / mx, bw = (W - 8) / 14, gy = base - sc;
-  let s = `<line x1="0" x2="${W}" y1="${base}" y2="${base}" stroke="#333"/><line x1="0" x2="${W}" y1="${gy.toFixed(1)}" y2="${gy.toFixed(1)}" stroke="#777" stroke-dasharray="4 5"/>`;
-  days.forEach((d, i) => { const x = 4 + i * bw + bw * .16, w = bw * .68, hh = clamp((d.sum || 0) / (d.G || 1), 0, mx) * sc;
-   if (hh) s += `<rect x="${x.toFixed(1)}" y="${(base - hh).toFixed(1)}" width="${w.toFixed(1)}" height="${hh.toFixed(1)}" rx="${Math.min(5, w / 2).toFixed(1)}" fill="${d.valid ? '#f4f4f4' : '#454545'}"/>`;
-   else s += `<rect x="${x.toFixed(1)}" y="${base - 2}" width="${w.toFixed(1)}" height="2" rx="1" fill="#2a2a2a"/>`;
-   if (W >= 360 || i % 2 === 0) s += `<text x="${(x + w / 2).toFixed(1)}" y="${H - 4}" text-anchor="middle" font-size="12" fill="${i === 13 ? '#fff' : '#777'}">${i === 13 ? 'auj.' : JOURS[pk(d.k).getDay()].slice(0, 1)}</text>`; });
-  fm.innerHTML = s; };
- if (roM) roM.disconnect();
- roM = new ResizeObserver(dm); roM.observe(fm);
-}
-
 /* ---------- rendu ---------- */
 function render() {
  if (!S) return;
@@ -682,7 +668,6 @@ function render() {
  v.innerHTML = ui.tab === 'jour' ? vJour() : ui.tab === 'evo' ? vEvo() : vMoi();
  document.querySelectorAll('#tabs button').forEach(b => { const on = b.dataset.t === ui.tab; b.classList.toggle('on', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
  $('#demo').innerHTML = S.demo ? `<div class="banner"><span>mode démo · 6 semaines simulées</span><button class="pill sm" style="min-height:36px;padding:0 14px;font-size:14px;white-space:normal" data-a="real">démarrer pour de vrai</button></div>` : '';
- if (ui.tab === 'evo') drawEvo();
 }
 function setTab(t) { ui.tab = t; if (t !== 'jour') ui.day = null; try { history.replaceState(null, '', '#' + t); } catch (e) {} render(); window.scrollTo(0, 0); }
 
@@ -699,10 +684,10 @@ const snapDay = k => { const before = JSON.stringify(S.days[k] || null); return 
 
 /* ---------- bilan & coach ---------- */
 function bilan() {
- const k = ui.day || todayK(), b = dayCalc(k), d = dayOf(k), G = b.G, live = k === todayK();
- sheet(`<div class="w h2">bilan · ${k === todayK() ? 'aujourd’hui' : dLabel(k)}</div><div class="w num" style="font-size:44px;margin:12px 0 2px">${b.sum < 0 ? '−' : '+'}${fmt(Math.abs(b.sum))} xp</div><p class="p" style="margin-bottom:12px"><b>${b.valid ? (b.perfect ? 'journée parfaite.' : 'objectif atteint.') : live ? `il te manque ${fmt(G - b.sum)} xp. il reste du temps.` : `objectif raté de ${fmt(G - b.sum)} xp.`}</b> objectif du jour : ${fmt(G)} xp.</p>
+ const k = ui.day || todayK(), b = dayCalc(k), d = dayOf(k), live = k === todayK();
+ sheet(`<div class="w h2">bilan · ${k === todayK() ? 'aujourd’hui' : dLabel(k)}</div><div class="w num" style="font-size:44px;margin:12px 0 2px">${b.sum < 0 ? '−' : '+'}${fmt(Math.abs(b.sum))} xp</div><p class="p" style="margin-bottom:12px"><b>${b.done}/${b.n} missions. ${b.rest ? 'jour de repos.' : b.valid ? (b.perfect ? 'journée parfaite.' : 'objectif atteint.') : live ? `il en manque ${left(b)}, il reste du temps.` : `objectif raté de ${plural(left(b), 'mission')}.`}</b></p>
   <div class="card" style="background:#1b1b1b;padding:12px 16px">${rec(b)}</div>
-  <label class="l">où est parti ton xp</label><div class="chips">${STATS.map(s => { const v = Math.round(b.xp[s.k]); return `<span class="chip ${v > 0 ? 'on' : ''}">${s.n} ${v < 0 ? '−' + -v : '+' + v}</span>`; }).join('')}</div>
+  <label class="l">xp par stat</label><div class="chips">${STATS.map(s => { const v = Math.round(b.xp[s.k]); return `<span class="chip ${v > 0 ? 'on' : ''}">${s.n} ${v < 0 ? '−' + -v : '+' + v}</span>`; }).join('')}</div>
   ${HAS_CLAUDE ? `<div class="sech" style="margin:22px 4px 10px"><span class="w h3">le coach</span><span class="sm mute">${d.deb ? 'enregistré' : ''}</span></div><div class="coach" id="coach">${d.deb ? esc(d.deb) : '<span class="mute">il lit ta journée et te dit les choses telles qu’elles sont.</span>'}</div>
   <div class="prow" style="margin-top:14px"><button class="pill g" data-a="close">fermer</button><button class="pill" data-a="coach" data-k="${k}">${d.deb ? 'redemander' : 'avis du coach'}</button></div>` : '<button class="pill" style="margin-top:22px" data-a="close">fermer</button>'}`);
 }
@@ -714,13 +699,13 @@ function context(k) {
  return { prenom_du_perso: S.name, date: dLabel(k), rang: STAGES[c.stage], niveau_global: c.glv, serie_jours: streak(),
   niveaux: Object.fromEntries(STATS.map(s => [s.n, c.lv[s.k]])), stat_la_plus_faible: weak.n,
   missions: b.ms.map(x => ({ mission: x.m.n, validee: x.on })),
-  xp_du_jour: b.sum, objectif_xp_du_jour: b.G, journee_parfaite: b.perfect, objectif_atteint: b.valid, balance_du_jour: b.bal === 1 ? 'plus produit que consommé' : b.bal === -1 ? 'plus consommé que produit' : b.bal === 0 ? 'moitié-moitié' : 'pas renseignée' };
+  missions_validees: b.done, missions_du_jour: b.n, objectif_missions: b.G, xp_du_jour: b.sum, journee_parfaite: b.perfect, objectif_atteint: b.valid, balance_du_jour: b.bal === 1 ? 'plus produit que consommé' : b.bal === -1 ? 'plus consommé que produit' : b.bal === 0 ? 'moitié-moitié' : 'pas renseignée' };
 }
 async function coach(k) {
  const box = $('#coach'), d = dayOf(k); box.innerHTML = '<span class="mute">le coach lit ta journée…</span>';
  const sample = await getSample();
  if (!sample) { box.innerHTML = '<span class="mute">le coach n’est pas joignable depuis cette vue. le reste de l’app marche sans lui.</span>'; return; }
- const prompt = `tu es le coach intégré d'evolvr, une app où un perso évolue selon la vraie journée du joueur (chaque mission validée donne de l'xp ; chaque jour il dit si sa journée a penché build ou conso : +50 ou −50 xp ; objectif quotidien en xp). voici sa journée en json :\n${JSON.stringify(context(k))}\n\nécris-lui un bilan en français, tout en minuscules, en le tutoyant, ton direct de coach, sans emoji, sans flatterie gratuite : si la journée est molle, dis-le franchement mais sans l'humilier. 4 phrases maximum (70 mots max). cite au moins un chiffre réel. termine par une seule mission concrète pour demain, qui commence par "demain :". réponds uniquement avec le texte.`;
+ const prompt = `tu es le coach intégré d'evolvr, une app où un perso évolue selon la vraie journée du joueur (chaque mission validée donne 30 xp ; le soir il dit si son temps est allé à construire ou à consommer : +50 ou −50 xp ; objectif : valider 70 % de ses missions du jour). voici sa journée en json :\n${JSON.stringify(context(k))}\n\nécris-lui un bilan en français, tout en minuscules, en le tutoyant, ton direct de coach, sans emoji, sans flatterie gratuite : si la journée est molle, dis-le franchement mais sans l'humilier. 4 phrases maximum (70 mots max). cite au moins un chiffre réel. termine par une seule mission concrète pour demain, qui commence par "demain :". réponds uniquement avec le texte.`;
  try {
   const r = await sample(prompt, { modelTier: 'quick', cache: false, onText: ({ text }) => { box.textContent = text; } });
   d.deb = (r && r.text || box.textContent || '').trim(); box.textContent = d.deb; S.upd = Date.now(); saveLocal(); markDirty(['core', 'm-' + k.slice(0, 7)]);
@@ -731,12 +716,12 @@ function settings(go) {
  const st = sync.state === 'cloud' ? 'sauvegardé dans ton compte claude, sur tous tes appareils.' : sync.state === 'erreur' ? 'la sauvegarde en ligne a échoué, tes données restent sur cet appareil.' : sync.state === 'plein' ? 'espace de sauvegarde plein.' : HAS_CLAUDE ? 'sauvegardé sur cet appareil uniquement.' : 'sauvegardé sur ce téléphone. pense à copier une sauvegarde de temps en temps (options avancées).';
  sheet(`<div class="w h2">réglages</div>
   <label class="l" for="sname">nom du perso</label><input class="inp" id="sname" maxlength="20" value="${esc(S.name)}" autocomplete="off">
-  <label class="l" for="sreq">exigence de l’objectif du jour</label><select class="inp" id="sreq">${[[.6, 'souple · 60 % de l’xp possible'], [.7, 'normal · 70 %'], [.85, 'exigeant · 85 %'], [1, 'parfait · 100 %']].map(([v, l]) => `<option value="${v}" ${req() === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
-  <label class="l" for="scut">ta journée se termine à</label><select class="inp" id="scut">${[0, 1, 2, 3, 4, 5, 6].map(h => `<option value="${h}" ${cut() === h ? 'selected' : ''}>${h}h du matin</option>`).join('')}</select>
   <button class="tog" style="margin-top:14px" data-a="missions"><span>mes missions<span class="sm mute" style="display:block;font-weight:500">${S.missions.length} mission${S.missions.length > 1 ? 's' : ''} · ajouter, modifier, supprimer</span></span><span class="mute">›</span></button>
   <div class="sech" style="margin:24px 4px 6px"><span class="w h3">données</span></div><p class="p sm" style="margin:0 4px 12px">${st}</p>
   <details class="adv"><summary class="tog"><span>options avancées</span><span class="mute">›</span></summary>
-  <div class="prow" style="margin-top:12px"><button class="pill sm g" data-a="intro">revoir l’intro</button><button class="pill sm g" data-a="demo">voir la démo</button></div>
+  <label class="l" for="sreq">objectif du jour</label><select class="inp" id="sreq">${[[.6, 'souple · 60 % des missions'], [.7, 'normal · 70 % des missions'], [.85, 'exigeant · 85 % des missions'], [1, 'parfait · toutes les missions']].map(([v, l]) => `<option value="${v}" ${req() === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
+  <label class="l" for="scut">ta journée se termine à</label><select class="inp" id="scut">${[0, 1, 2, 3, 4, 5, 6].map(h => `<option value="${h}" ${cut() === h ? 'selected' : ''}>${h}h du matin</option>`).join('')}</select>
+  <div class="prow" style="margin-top:16px"><button class="pill sm g" data-a="intro">revoir l’intro</button><button class="pill sm g" data-a="demo">voir la démo</button></div>
   <div class="prow" style="margin-top:10px"><button class="pill sm g" data-a="export">copier une sauvegarde</button><button class="pill sm g" data-a="import">importer</button></div>
   <button class="pill sm o" style="margin-top:10px;width:100%;color:var(--red)" data-a="wipe">nouveau compte : tout effacer</button></details>
   <button class="pill" style="margin-top:22px" data-a="close">ok</button>`);
@@ -747,16 +732,16 @@ function settings(go) {
 function missionsSheet() {
  const have = new Set(S.missions.map(m => m.n.toLowerCase())), full = S.missions.length >= MAXM;
  sheet(`<div class="w h2">mes missions</div><p class="p sm" style="margin:8px 0 10px"><b>tes vraies habitudes du quotidien.</b> touche une mission pour la modifier ou la supprimer.</p>
-  ${S.missions.map(m => `<button class="tog" data-a="medit" data-id="${m.id}"><span>${esc(m.n)}<span class="sm mute" style="display:block;font-weight:500">${SN[m.stat]} · +${m.xp} xp · ${m.days.length === 7 ? 'tous les jours' : m.days.map(d => JOURS[d]).join(' ')}${m.off ? ' · en pause' : ''}</span></span><span class="mute">›</span></button>`).join('') || '<p class="p sm">aucune mission pour l’instant.</p>'}
+  ${S.missions.map(m => `<button class="tog" data-a="medit" data-id="${m.id}"><span>${esc(m.n)}<span class="sm mute" style="display:block;font-weight:500">${SN[STAT_MAP[m.stat]] || ''} · ${m.days.length === 7 ? 'tous les jours' : m.days.map(d => JOURS[d]).join(' ')}${m.off ? ' · en pause' : ''}</span></span><span class="mute">›</span></button>`).join('') || '<p class="p sm">aucune mission pour l’instant.</p>'}
   ${full ? `<p class="p sm" style="margin-top:12px">${MAXM} missions max : garde l’essentiel.</p>` : `<button class="pill" style="margin-top:16px" data-a="medit" data-id="">+ créer ma mission</button>
   <label class="l">ou pioche une idée</label>${LIB.map(([cat, items], c) => { const left = items.map((it, j) => [it, j]).filter(([it]) => !have.has(it[0].toLowerCase())); return left.length ? `<div class="sm mute" style="margin:10px 4px 6px;font-weight:600">${cat}</div><div class="chips">${left.map(([it, j]) => `<button class="chip" data-a="libadd" data-c="${c}" data-j="${j}">+ ${esc(it[0])}</button>`).join('')}</div>` : ''; }).join('')}`}
   <button class="pill g" style="margin-top:22px" data-a="close">terminé</button>`);
 }
 function mEdit(id) {
- const m = S.missions.find(x => x.id === id) || { id: '', n: '', stat: 'force', xp: 30, days: ALL.slice() };
+ const m = S.missions.find(x => x.id === id) || { id: '', n: '', stat: 'corps', days: ALL.slice() }, ms0 = STAT_MAP[m.stat] || 'corps';
  sheet(`<div class="w h2">${m.id ? 'mission' : 'nouvelle mission'}</div>
   <label class="l" for="mn">nom</label><input class="inp" id="mn" maxlength="40" value="${esc(m.n)}" placeholder="ex. 50 squats" autocomplete="off">
-  <div class="prow"><div><label class="l" for="ms">stat</label><select class="inp" id="ms">${STATS.map(s => `<option value="${s.k}" ${m.stat === s.k ? 'selected' : ''}>${s.n}</option>`).join('')}</select></div><div><label class="l" for="mx">xp</label><select class="inp" id="mx">${[10, 20, 25, 30, 35, 40, 45, 50, 60, 80, 100].map(v => `<option value="${v}" ${m.xp === v ? 'selected' : ''}>+${v} xp</option>`).join('')}</select></div></div>
+  <label class="l">ça fait monter</label><div class="chips" id="mstats">${STATS.map(st => `<button class="chip ${ms0 === st.k ? 'on' : ''}" data-a="mstat" data-k="${st.k}">${st.n}</button>`).join('')}</div>
   <label class="l">jours</label><div class="chips" id="mdays">${[1, 2, 3, 4, 5, 6, 0].map(d => `<button class="chip ${m.days.includes(d) ? 'on' : ''}" data-a="mday" data-d="${d}">${JOURS[d]}</button>`).join('')}</div>
   ${m.id ? `<button class="tog ${m.off ? '' : 'on'}" data-a="moff" style="margin-top:10px"><span>active</span><span class="sw"></span></button>` : ''}
   <div class="prow" style="margin-top:20px">${m.id ? `<button class="pill g" data-a="mdel" data-id="${m.id}">supprimer</button>` : `<button class="pill g" data-a="missions">annuler</button>`}<button class="pill" data-a="msave" data-id="${m.id}">enregistrer</button></div>`);
@@ -775,12 +760,13 @@ const ACT = {
  bal: (d, el, e) => { const k = ui.day || todayK(); if (balLocked(k) || !editable(k)) return; const day = dayOf(k), b0 = dayCalc(k).bx, v = +d.v; day.b = day.b === v ? null : v; buzz(); commit(k); floatXp(e, dayCalc(k).bx - b0); },
  medit: d => mEdit(d.id),
  mday: (d, el) => el.classList.toggle('on'),
+ mstat: (d, el) => { document.querySelectorAll('#mstats .chip').forEach(c => c.classList.toggle('on', c === el)); },
  moff: (d, el) => el.classList.toggle('on'),
  msave: d => {
   const n = $('#mn').value.trim(); if (!n) { $('#mn').focus(); return; }
   const days = [...document.querySelectorAll('#mdays .chip.on')].map(e => +e.dataset.d); if (!days.length) { toast('choisis au moins un jour'); return; }
   let m = S.missions.find(x => x.id === d.id); if (!m) { if (S.missions.length >= MAXM) { toast(`${MAXM} missions max : garde l’essentiel`); return; } m = { id: uid() }; S.missions.push(m); }
-  Object.assign(m, { n: n.slice(0, 40), type: 'check', stat: $('#ms').value, xp: clamp(+$('#mx').value || 30, 5, 200), days });
+  const sk = document.querySelector('#mstats .chip.on'); Object.assign(m, { n: n.slice(0, 40), type: 'check', stat: sk ? sk.dataset.k : 'corps', days }); delete m.xp;
   const off = document.querySelector('[data-a=moff]'); if (off) m.off = !off.classList.contains('on');
   commit(); missionsSheet();
  },
@@ -812,14 +798,14 @@ document.addEventListener('visibilitychange', async () => { if (document.hidden 
 /* ---------- onboarding (façon pushr) ---------- */
 const LOGO = (h = 34) => `<svg viewBox="0 0 170 40" style="height:${h}px;width:auto;display:block" aria-label="evolvr"><text x="2" y="31" fill="#f4f4f4" filter="url(#gl)" class="w" style="font-size:34px">evolvr</text></svg>`;
 function onboarding(replay) {
- const ov = $('#over'); let name = S ? S.name : '', cst = 'force'; const ms = (S ? S.missions : []).map(m => ({ ...m }));
- const zero = { force: 0, cardio: 0, build: 0, focus: 0, disc: 0, chari: 0 }, mid = { force: .7, cardio: .5, build: .8, focus: .7, disc: .9, chari: .5 };
+ const ov = $('#over'); let name = S ? S.name : '', cst = 'corps'; const ms = (S ? S.missions : []).map(m => ({ ...m }));
+ const zero = { force: 0, cardio: 0, build: 0, focus: 0, disc: 0, chari: 0 }, mid = { force: .7, cardio: .42, build: .8, focus: .7, disc: .9, chari: 0 };
  const frame = inner => `<div class="full"><div class="blob"></div><div class="ob">${inner}</div></div>`;
  const sheetb = (ill, body) => `<div class="sheetb"><div class="ill">${ill}</div><div class="tx">${body}</div></div>`;
  const steps = [
   () => { ov.innerHTML = frame(`<div class="mid"><div class="w h1 blur-in" id="salut">salut</div></div>`); setTimeout(() => { const s = $('#salut'); if (s) s.className = 'w h1 blur-out'; }, 1300); setTimeout(next, 1900); },
   () => { ov.innerHTML = frame(`<div style="padding:0 22px calc(28px + env(safe-area-inset-bottom,0px))"><div class="w h1 blur-in">bienvenue à</div><div class="blur-in" style="margin-top:6px">${LOGO(40)}</div><p class="p blur-in" style="margin:18px 4px 24px;animation-delay:.15s"><b>evolvr est le jeu où le perso, c’est toi.</b> chaque chose que tu fais dans la vraie vie le fait évoluer : ton sport, ton taff, ce que tu construis.</p><button class="pill blur-in" style="animation-delay:.3s" data-o="next">allons-y</button></div>`); },
-  () => { ov.innerHTML = frame(sheetb(avatar({ t: zero, stage: 0, anim: false, id: 'o1' }).replace('viewBox="0 0 240 290"', 'viewBox="20 8 200 278"'), `<p class="p" style="margin-top:0"><b>ton perso part de zéro.</b> il est mou, il se tient mal, il n’a rien construit.</p><p class="p"><b>tu fais tes pompes, il prend du muscle.</b> tu bosses sur ton business, son socle monte. tu lâches trois jours, il redescend.</p><button class="pill" data-o="next">j’ai compris</button>`)); },
+  () => { ov.innerHTML = frame(sheetb(avatar({ t: zero, stage: 0, anim: false, id: 'o1' }).replace('viewBox="0 0 240 290"', 'viewBox="20 8 200 278"'), `<p class="p" style="margin-top:0"><b>ton perso part de zéro.</b> il est mou, il se tient mal, il n’a rien construit.</p><p class="p"><b>tu fais ton sport, il prend du muscle.</b> tu bosses sur ton business, son socle monte. tu lâches trois jours, il redescend.</p><button class="pill" data-o="next">j’ai compris</button>`)); },
   () => { ov.innerHTML = frame(sheetb(`<svg viewBox="0 0 200 150"><ellipse cx="100" cy="132" rx="80" ry="10" fill="#111"/>${cube(70, 74, 40)}<g opacity=".55"><rect x="138" y="92" width="26" height="42" rx="6" fill="#0c0c0c" stroke="#777" stroke-width="2"/><rect x="142" y="97" width="18" height="30" rx="3" fill="#555"/></g></svg>`, `<div class="w h2" style="margin-bottom:6px">les règles</div>${RULES()}<p class="p" style="margin-top:14px"><b>rater un jour, ça arrive.</b> deux de suite, ta série repart à zéro.</p><button class="pill" data-o="next">continuer</button>`)); },
   () => { ov.innerHTML = frame(sheetb(avatar({ t: mid, stage: 3, anim: false, id: 'o2', mood: 'c' }).replace('viewBox="0 0 240 290"', 'viewBox="20 8 200 278"'), `<div class="w h2">comment il s’appelle ?</div><p class="p" style="margin:10px 0 14px">tu pourras le changer plus tard.</p><input class="inp w" id="oname" maxlength="20" value="${replay ? esc(name) : ''}" placeholder="nom" style="font-size:20px;margin-bottom:14px" autocomplete="off"><button class="pill" data-o="name">continuer</button>`)); setTimeout(() => { const i = $('#oname'); if (i) i.focus(); }, 500); },
   () => renderMis(),
@@ -850,7 +836,7 @@ function onboarding(replay) {
   else if (o === 'lib') { const n = LIB[+b.dataset.c][1][+b.dataset.j][0].toLowerCase(), at = ms.findIndex(m => m.n.toLowerCase() === n); if (at >= 0) ms.splice(at, 1); else if (ms.length < MAXM) ms.push(libM(+b.dataset.c, +b.dataset.j)); renderMis(); }
   else if (o === 'rm') { const at = ms.findIndex(m => m.id === b.dataset.id); if (at >= 0) ms.splice(at, 1); renderMis(); }
   else if (o === 'cst') { cst = b.dataset.k; renderMis(); }
-  else if (o === 'cadd') { const inp = $('#ocust'), n = inp.value.trim().slice(0, 40); if (!n) { inp.focus(); return; } if (ms.length < MAXM) ms.push({ id: uid(), n, type: 'check', stat: cst, xp: 30, days: ALL.slice() }); inp.value = ''; renderMis(); }
+  else if (o === 'cadd') { const inp = $('#ocust'), n = inp.value.trim().slice(0, 40); if (!n) { inp.focus(); return; } if (ms.length < MAXM) ms.push({ id: uid(), n, type: 'check', stat: cst, days: ALL.slice() }); inp.value = ''; renderMis(); }
   else if (o === 'mgo') { if (ms.length) next(); }
   else if (o === 'demo') finish(true); else if (o === 'go') finish(false); };
  ov.addEventListener('click', h);
@@ -864,6 +850,7 @@ function boot() {
  if (!S.set) S.set = { cut: 4 };
  if (!S.v4) { S.missions = S.missions.filter(m => m.type !== 'auto').map(m => { if (m.type === 'count') { for (const k in S.days) { const dm = S.days[k].m; if (dm && dm[m.id] != null) dm[m.id] = dm[m.id] >= m.target ? 1 : 0; } } return { id: m.id, n: m.id === 'pompes' && m.n === 'pompes' ? '100 pompes' : m.id === 'pas' && m.n === 'pas' ? '8 000 pas' : m.n, type: 'check', stat: m.stat, xp: m.xp, days: m.days, ...(m.off ? { off: true } : {}) }; }); if (!S.set.goal) S.set.goal = 200; S.v4 = 1; S.v3 = 1; saveLocal(); markDirty(['core', ...monthsList()]); }
  if (!S.set.req) S.set.req = .7;
+ if (!S.v5) { S.missions.forEach(m => { m.stat = STAT_MAP[m.stat] || 'disc'; delete m.xp; }); S.seen = null; S.v5 = 1; saveLocal(); markDirty(['core']); }
  if (!S.v3) { S.missions = S.missions.filter(m => m.type !== 'auto'); if (!S.set.goal) S.set.goal = 200; S.v3 = 1; saveLocal(); }
  if (!S.days) S.days = {};
  const h = location.hash.slice(1); ui.tab = h === 'build' ? 'jour' : ['moi', 'jour', 'evo'].includes(h) ? h : 'moi';
