@@ -188,12 +188,23 @@ label.l{display:block;font-size:13px;font-weight:600;color:var(--mute);margin:14
 .tl div{text-align:center;background:var(--s1);border-radius:20px;padding:6px 4px 10px}
 .tl svg{width:100%;height:150px}
 .tots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.ach{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.ach div{text-align:center;font-size:13px;font-weight:600;line-height:1.2}
+.ach{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 10px}
+.ach>div{text-align:center;font-size:13px;font-weight:600;line-height:1.25;min-width:0;overflow-wrap:anywhere;hyphens:auto}
+.ach>div .mute{font-size:12px;margin-top:2px}
 .ach svg{width:100%;max-width:70px;aspect-ratio:1;display:block;margin:0 auto 6px}
 .ach .lk{opacity:.28}
 /* sheet */
 #sw{position:fixed;inset:0;z-index:50;pointer-events:none}
+#tour{position:fixed;inset:0;z-index:80;touch-action:none}
+#tour .tsp{position:fixed;border-radius:22px;box-shadow:0 0 0 200vmax rgba(0,0,0,.8);transition:all .35s cubic-bezier(.3,.7,.2,1);pointer-events:none;outline:2px solid rgba(255,255,255,.9);outline-offset:0}
+#tour .tbub{position:fixed;left:16px;right:16px;max-width:440px;margin:0 auto;background:#fff;color:#000;border-radius:24px;padding:18px 18px 14px;transition:top .35s,bottom .35s,opacity .25s;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+#tour .tbub b{display:block;font-family:Archivo,"Arial Black",sans-serif;font-stretch:125%;font-weight:800;font-size:19px;letter-spacing:-.01em;margin-bottom:6px}
+#tour .tbub p{margin:0;font-size:15px;line-height:1.4;color:#333;font-weight:500}
+#tour .tft{display:flex;align-items:center;justify-content:space-between;margin-top:14px;gap:10px}
+#tour .tft span{font-size:13px;color:#888;font-weight:600}
+#tour .tft button{height:42px;padding:0 18px;border-radius:21px;font-weight:700;font-size:15px}
+#tour .tsk{color:#777}
+#tour .tnx{background:#000;color:#fff}
 #sw .scrim{position:absolute;inset:0;background:rgba(0,0,0,.6);opacity:0;transition:opacity .3s}
 #sw .sheet{position:absolute;left:50%;bottom:0;width:min(520px,100%);transform:translate(-50%,105%);transition:transform .38s cubic-bezier(.2,.85,.25,1);background:#141414;border-radius:30px 30px 0 0;max-height:92%;overflow:auto;padding:10px 18px calc(24px + env(safe-area-inset-bottom,0px));overscroll-behavior:contain}
 #sw.on{pointer-events:auto}#sw.on .scrim{opacity:1}#sw.on .sheet{transform:translate(-50%,0)}
@@ -268,7 +279,6 @@ label.l{display:block;font-size:13px;font-weight:600;color:var(--mute);margin:14
  </defs>
 </svg>
 
-<div id="boot" style="position:fixed;inset:0;background:#000;z-index:100;display:flex;align-items:center;justify-content:center;transition:opacity .35s ease"><svg viewBox="0 0 170 40" style="width:46vw" aria-label="evolvr"><text x="85" y="31" text-anchor="middle" fill="#f4f4f4" filter="url(#gl)" class="w" style="font-size:34px">evolvr</text></svg></div>
 <div id="app" hidden>
  <header class="top">
   <svg class="logo" viewBox="0 0 150 34" aria-label="evolvr"><text x="2" y="27" fill="#f4f4f4" filter="url(#gl)" class="w" style="font-size:29px">evolvr</text></svg>
@@ -456,12 +466,11 @@ const ACH = [
  {n:'semaine propre', d:'série de 7 jours', f:A => A.best >= 7},
  {n:'inarrêtable', d:'série de 30 jours', f:A => A.best >= 30},
  {n:'journée parfaite', d:'toutes les missions d’un jour', f:A => A.perfect >= 1},
- {n:'perfectionniste', d:'10 journées parfaites', f:A => A.perfect >= 10},
+ {n:'sans faute', d:'10 journées parfaites', f:A => A.perfect >= 10},
  {n:'50 missions', d:'validées au total', f:A => A.missions >= 50},
  {n:'500 missions', d:'validées au total', f:A => A.missions >= 500},
- {n:'côté build', d:'7 jours qui penchent build', f:A => A.buildDays >= 7},
- {n:'mois build', d:'30 jours qui penchent build', f:A => A.buildDays >= 30},
- {n:'bâtisseur', d:'100 jours qui penchent build', f:A => A.buildDays >= 100},
+ {n:'productif', d:'7 journées productives', f:A => A.buildDays >= 7},
+ {n:'bâtisseur', d:'50 journées productives', f:A => A.buildDays >= 50},
  {n:'builder', d:'rang builder', f:(A,c) => c.stage >= 3},
  {n:'niveau 10', d:'niveau global', f:(A,c) => c.glv >= 10},
  {n:'titan', d:'rang titan', f:(A,c) => c.stage >= 5},
@@ -527,21 +536,6 @@ function fresh(name, missions) {
  memo = null;
  S = { v: 1, name: name || 'toi', start: T, set: { cut: 4, req: .7 }, v3: 1, v4: 1, v5: 1, missions, days: {}, demo: false, seen: null, upd: Date.now() };
 }
-function demo() {
- const name = S ? S.name : 'max', missions = S && S.missions.length ? S.missions : DEF_M();
- const T = todayK(); fresh(name, missions); S.demo = true; S.start = addD(T, -45);
- let sd = 42; const r = () => (sd = sd * 16807 % 2147483647) / 2147483647;
- for (let k = S.start, i = 0; k < T; k = addD(k, 1), i++) {
-  const p = i / 45; const d = dayOf(k); const wd = pk(k).getDay();
-  if (i >= 12 && i <= 14) { d.b = -1; continue; }
-  const lvl = .35 + p * .55 + (r() - .5) * .25;
-  S.missions.forEach(m => { if (m.days.includes(wd) && r() < lvl + .12) d.m[m.id] = 1; });
-  d.b = r() < .25 + p * .55 ? 1 : r() < .5 ? 0 : -1;
-
- }
- const d = dayOf(T); d.m.pompes = 1;
- memo = null; S.seen = snapshotLv(C()); S.goalDay = null; S.upd = Date.now(); saveLocal(); markDirty(['core', ...monthsList()]);
-}
 function realStart() { const n = S.name, m = S.missions; fresh(n, m); S.seen = snapshotLv(C()); }
 
 /* ---------- level up ---------- */
@@ -571,7 +565,7 @@ function levelUp(b, c) {
 }
 
 /* ---------- vues ---------- */
-const RULES = () => `<div class="rule"><b class="w num">+${MXP}</b><span><b>xp par mission validée.</b> la stat de la mission monte.</span></div><div class="rule"><b class="w num">±${BAL_XP}</b><span><b>au bilan du soir (dès ${BAL_H}h).</b> ton temps est surtout allé à construire ? +${BAL_XP}. à consommer ? −${BAL_XP}.</span></div><div class="rule"><b class="w num">${Math.round(req() * 100)}%</b><span><b>de tes missions du jour = objectif atteint.</b> ta série monte d’un jour.</span></div>`;
+const RULES = () => `<div class="rule"><b class="w num">+${MXP}</b><span><b>par mission cochée.</b> ton perso progresse là où tu bosses : le sport muscle son corps, le taff fait monter son build.</span></div><div class="rule"><b class="w num">±${BAL_XP}</b><span><b>le soir, dès ${BAL_H}h : une question.</b> ta journée a été productive ? +${BAL_XP} xp. plutôt scroll et écrans ? −${BAL_XP} xp.</span></div><div class="rule"><b class="w num">${Math.round(req() * 100)}%</b><span><b>de tes missions cochées = objectif atteint.</b> ta série monte d’un jour.</span></div>`;
 const rec = b => [['missions', b.mis], ['bilan du soir', b.bx]].map(([l, v]) => `<div class="rc"><span>${l}</span><b class="num ${v < 0 ? 'neg' : ''}">${v < 0 ? '−' : '+'}${fmt(Math.abs(v))} xp</b></div>`).join('');
 const left = b => Math.max(0, b.G - b.done);
 const plural = (n, w) => `${n} ${w}${n > 1 ? 's' : ''}`;
@@ -582,11 +576,11 @@ function hint(c, b) {
  if (b.valid) return 'objectif atteint. je me sens plus fort, merci.';
  if (danger()) return `hier raté. valide aujourd’hui pour sauver ta série de ${streak()} j.`;
  if (!next && b.bal == null && lock) return `missions bouclées. on se retrouve à ${BAL_H}h pour le bilan.`;
- if (b.bal === -1) return 'journée côté conso. on renverse la balance ?';
- if (b.bal == null && !lock) return 'le bilan du soir est ouvert. aujourd’hui, ton temps est surtout allé où ?';
+ if (b.bal === -1) return 'les écrans ont gagné aujourd’hui. on renverse demain ?';
+ if (b.bal == null && !lock) return 'le bilan du soir est ouvert. alors, journée productive ?';
  if (atro) return `ma stat ${atro.n} redescend : ${diffD(c.last[atro.k], T)} jours sans.${next && next.m.stat === atro.k ? ` on fait ${next.m.n} ?` : ''}`;
  if (b.rest) return 'pas de mission aujourd’hui. repos, ou ajoute-en une.';
- if (!b.done) return next ? `on commence par quoi ? ${next.m.n} ?` : 'dis-moi vers où penche ta journée.';
+ if (!b.done) return next ? `on commence par quoi ? ${next.m.n} ?` : 'fais le bilan de ta journée en bas.';
  return `encore ${plural(left(b), 'mission')}.${next ? ` prochaine : ${next.m.n}.` : ''}`;
 }
 function todayCard(b, st) {
@@ -638,10 +632,10 @@ const balLocked = k => { const h = new Date().getHours(); return k === todayK() 
 function balCard(k, b) {
  const lock = balLocked(k);
  const ic = { 1: `<svg viewBox="0 0 32 32">${cube(16, 16, 11)}</svg>`, 0: '<svg viewBox="0 0 32 32"><path d="M16 6v20M6 10h20" stroke="#bbb" stroke-width="2.4" stroke-linecap="round"/><path d="M6 10l-4 8h8zM26 10l-4 8h8z" fill="#888"/><rect x="11" y="25" width="10" height="3" rx="1.5" fill="#bbb"/></svg>', '-1': '<svg viewBox="0 0 32 32"><rect x="9" y="3" width="14" height="26" rx="3.5" fill="#0d0d0d" stroke="#aaa" stroke-width="1.8"/><rect x="11.5" y="6.5" width="9" height="17" rx="1.5" fill="#fff" opacity=".8"/></svg>' };
- const BL = [[1, 'à construire', 'taff, projets, sport, apprendre', `+${BAL_XP}`], [0, 'moitié-moitié', 'un peu des deux', '0'], [-1, 'à consommer', 'scroll, séries, youtube', `−${BAL_XP}`]];
- const line = b.bal === 1 ? `<b>journée de construction.</b> +${BAL_XP} xp en build.` : b.bal === 0 ? '<b>équilibré.</b> ni bonus, ni malus.' : b.bal === -1 ? `<b>journée de conso.</b> −${BAL_XP} xp en build. demain, on renverse la balance.` : '<b>pas besoin de compter.</b> choisis juste ce qui a pris le plus de place.';
+ const BL = [[1, 'productive', 'taff, projets, sport, apprendre', `+${BAL_XP}`], [0, 'entre les deux', 'un peu des deux', '0'], [-1, 'scroll et écrans', 'réseaux, séries, youtube', `−${BAL_XP}`]];
+ const line = b.bal === 1 ? `<b>journée productive.</b> +${BAL_XP} xp en build.` : b.bal === 0 ? '<b>équilibré.</b> ni bonus, ni malus.' : b.bal === -1 ? `<b>les écrans ont gagné.</b> −${BAL_XP} xp en build. demain, on renverse.` : '<b>pas besoin de compter.</b> réponds au feeling.';
  if (lock) return `<section class="ratio bal sec"><div class="w h2">bilan du soir</div><p class="p sm" style="margin:6px 0 0">s’ouvre à ${BAL_H}h.</p><div class="balfig">${balSvg(null)}</div><p class="p sm" style="margin-top:4px"><b>fais tes missions, on fera les comptes ce soir.</b> d’ici là, construis.</p></section>`;
- return `<section class="ratio bal sec"><div class="w h2">bilan du soir</div><p class="p" style="margin:8px 0 0"><b>1. ${k === todayK() ? 'aujourd’hui' : 'ce jour-là'}, ton temps est surtout allé…</b></p><div class="balfig">${balSvg(b.bal)}</div>
+ return `<section class="ratio bal sec"><div class="w h2">bilan du soir</div><p class="p" style="margin:8px 0 0"><b>1. ${k === todayK() ? 'ta journée' : 'cette journée'} a été plutôt…</b></p><div class="balfig">${balSvg(b.bal)}</div>
   <div class="bl">${BL.map(([v, l, ex, x]) => `<button class="brow ${b.bal === v ? 'on' : ''}" ${editable(k) ? `data-a="bal" data-v="${v}"` : 'disabled'} aria-pressed="${b.bal === v}"><span class="bi">${ic[v]}</span><span class="bt"><b>${l}</b><span>${ex}</span></span><span class="bx num">${x} xp</span></button>`).join('')}</div>
   <p class="p sm" style="margin-top:12px">${line}</p><p class="p sm" style="margin:18px 0 10px"><b>2. tes comptes.</b> ton xp du jour et l’avis du coach.</p><button class="pill" data-a="bilan">voir mon bilan</button></section>`;
 }
@@ -661,7 +655,7 @@ function vEvo() {
  if (steps.length < 2 && age > 0) steps.unshift(age);
  h += `<div class="tl">${steps.map(n => { const cc = n ? compute(addD(T, -n)) : c; return `<div>${avatar({ t: cc.av, stage: cc.stage, anim: false, id: 'tl' + n })}<div class="sm" style="font-weight:700">${n ? `il y a ${n >= 7 && n % 7 === 0 ? (n / 7) + ' sem.' : n + ' j'}` : 'aujourd’hui'}</div><div class="sm mute">niv. ${cc.glv}</div></div>`; }).join('')}</div>`;
  h += regCard(T);
- h += `<div class="sec tots">${[[A.best + ' j', 'meilleure série'], [fmt(A.missions), 'missions validées'], [A.buildDays, 'jours côté build']].map(([v, l]) => `<div class="kpi"><b class="w num">${v}</b><span>${l}</span></div>`).join('')}</div>`;
+ h += `<div class="sec tots">${[[A.best + ' j', 'meilleure série'], [fmt(A.missions), 'missions validées'], [A.buildDays, 'journées productives']].map(([v, l]) => `<div class="kpi"><b class="w num">${v}</b><span>${l}</span></div>`).join('')}</div>`;
  h += `<div class="sec"><div class="sech"><span class="w h3">trophées</span><span class="sm mute">${ACH.filter(a => a.f(A, c)).length}/${ACH.length}</span></div><div class="card ach">${ACH.map((a, i) => { const on = a.f(A, c); return `<div class="${on ? '' : 'lk'}">${medal(on, i)}${esc(a.n)}<div class="mute" style="font-weight:500">${esc(a.d)}</div></div>`; }).join('')}</div></div>`;
  return h;
 }
@@ -675,6 +669,48 @@ function render() {
  $('#demo').innerHTML = S.demo ? `<div class="banner"><span>mode démo · 6 semaines simulées</span><button class="pill sm" style="min-height:36px;padding:0 14px;font-size:14px;white-space:normal" data-a="real">démarrer pour de vrai</button></div>` : nag ? `<div class="banner"><span>${S.lastBackup ? `dernière sauvegarde il y a ${bkd} jours` : 'tu n’as jamais sauvegardé ta progression'}</span><button class="pill sm" style="min-height:36px;padding:0 14px;font-size:14px" data-a="export">sauvegarder</button></div>` : '';
 }
 function setTab(t) { ui.tab = t; if (t !== 'jour') ui.day = null; try { history.replaceState(null, '', '#' + t); } catch (e) {} render(); window.scrollTo(0, 0); }
+
+/* ---------- visite guidée ---------- */
+const TOUR = [
+ ['moi', '.hero .av', 'ça, c’est toi.', 'ton perso évolue avec ce que tu fais en vrai. au début il est mou, à toi de le construire.'],
+ ['moi', '.hero .who', 'ton niveau', 'chaque mission cochée te donne de l’xp. plus tu montes, plus ton perso change de rang et de matière.'],
+ ['moi', '.today', 'ta journée', 'tes missions faites aujourd’hui. touche ici pour aller les cocher.'],
+ ['moi', '.srow', 'tes 4 stats', 'le sport fait monter ton corps, la lecture ta tête, tes routines ta discipline, ton taff ton build.', 1],
+ ['jour', '.mis', 'coche tes missions', 'touche une mission quand c’est fait : +30 xp. coche-en assez pour atteindre l’objectif du jour.'],
+ ['jour', '[data-a="missions"]', 'tes missions, ta vie', 'ajoute, modifie ou supprime tes missions ici. mets tes vraies habitudes.'],
+ ['jour', '.bal', 'le bilan du soir', 'dès 17h, une seule question : ta journée a été productive, ou plutôt scroll et écrans ? +50 ou −50 xp.'],
+ ['evo', '.tl', 'ton évolution', 'ton perso au fil des semaines. reviens dans un mois, tu verras la différence.'],
+ ['evo', '.reg', 'ta régularité', 'chaque mission sur les 7 derniers jours. un rond blanc = fait.', 1],
+ ['evo', '.ach', 'tes trophées', 'à débloquer en tenant ta série et tes journées productives.'],
+ ['moi', '.setb', 'réglages', 'ton nom, tes missions, ta sauvegarde. tout est là.']];
+function tour(i) {
+ let el = $('#tour');
+ if (i >= TOUR.length || i < 0) { if (el) el.remove(); setTab('moi'); return; }
+ if (!el) {
+  el = document.createElement('div'); el.id = 'tour'; el.innerHTML = '<div class="tsp"></div><div class="tbub" style="opacity:0"></div>'; document.body.appendChild(el);
+  el.addEventListener('click', e => { const b = e.target.closest('[data-tour]'); buzz(); if (b && b.dataset.tour === 'skip') tour(-1); else tour(+el.dataset.i + 1); });
+ }
+ el.dataset.i = i;
+ const [tab, sel, title, txt, card] = TOUR[i];
+ if (ui.tab !== tab) setTab(tab);
+ let t = $(sel); if (t && card) t = t.closest('.card') || t;
+ if (!t) return tour(i + 1);
+ const vh = innerHeight, fixed = getComputedStyle(t.closest('.tabs') || t).position === 'fixed';
+ if (sel === '.setb') window.scrollTo(0, 0);
+ else if (!fixed) { const r0 = t.getBoundingClientRect(), y = scrollY + r0.top; window.scrollTo(0, Math.max(0, r0.height > vh * .42 ? y - 70 : y - (vh * .42 - r0.height / 2))); }
+ const sp = el.querySelector('.tsp'), bub = el.querySelector('.tbub');
+ bub.style.opacity = 0;
+ setTimeout(() => {
+  const r = t.getBoundingClientRect(), pad = 8, h = Math.min(r.height, vh * .42);
+  Object.assign(sp.style, { left: (r.left - pad) + 'px', top: (r.top - pad) + 'px', width: (r.width + pad * 2) + 'px', height: (h + pad * 2) + 'px' });
+  const last = i === TOUR.length - 1;
+  bub.innerHTML = `<b>${title}</b><p>${txt}</p><div class="tft"><span>${i + 1}/${TOUR.length}</span><div style="display:flex;gap:6px">${last ? '' : '<button class="tsk" data-tour="skip">passer</button>'}<button class="tnx" data-tour="next">${last ? 'c’est parti' : 'suivant'}</button></div></div>`;
+  const below = r.top + h / 2 < vh / 2;
+  bub.style.top = below ? (r.top + h + pad + 14) + 'px' : 'auto';
+  bub.style.bottom = below ? 'auto' : (vh - r.top + pad + 14) + 'px';
+  bub.style.opacity = 1;
+ }, 80);
+}
 
 /* ---------- toast & sheet ---------- */
 let tT = 0;
@@ -692,10 +728,10 @@ function persoLine(b, k) {
  const live = k === todayK(), st = streak(), l = left(b), h = k.split('-').reduce((a, x) => a + +x, 0) % 2;
  const tail = st >= 3 && b.valid ? ` ${st} jours d’affilée.` : '';
  if (b.rest) return 'jour de repos. demain on reprend.';
- if (b.perfect && b.bal === 1) return h ? 'tout validé et une journée de construction. je me sens plus solide que jamais.' : 'journée parfaite, de bout en bout. c’est ce genre de jour qui me fait grandir.';
- if (b.perfect) return `toutes les missions validées. journée parfaite.${b.bal === -1 ? ' par contre, la conso a gagné : on garde ça en tête.' : ''}${tail}`;
- if (b.valid && b.bal === 1) return `${plural(b.done, 'mission')} sur ${b.n} et une journée de construction. c’est comme ça qu’on monte.${tail}`;
- if (b.valid && b.bal === -1) return `objectif atteint, mais la conso a pris le dessus. demain on garde le rythme et on lâche le téléphone.`;
+ if (b.perfect && b.bal === 1) return h ? 'tout validé et une journée productive. je me sens plus solide que jamais.' : 'journée parfaite, de bout en bout. c’est ce genre de jour qui me fait grandir.';
+ if (b.perfect) return `toutes les missions validées. journée parfaite.${b.bal === -1 ? ' par contre, les écrans ont gagné : on garde ça en tête.' : ''}${tail}`;
+ if (b.valid && b.bal === 1) return `${plural(b.done, 'mission')} sur ${b.n} et une journée productive. c’est comme ça qu’on monte.${tail}`;
+ if (b.valid && b.bal === -1) return `objectif atteint, mais les écrans ont pris le dessus. demain on garde le rythme et on lâche le téléphone.`;
  if (b.valid) return (h ? `objectif atteint, ${b.done}/${b.n}. on continue comme ça.` : `${b.done} sur ${b.n}, c’est validé. je sens la différence.`) + tail;
  const next = b.ms.find(x => !x.on);
  if (live) return `il manque ${plural(l, 'mission')} pour l’objectif.${next ? ` il reste du temps : ${next.m.n} ?` : ''}`;
@@ -724,7 +760,7 @@ async function coach(k) {
  const box = $('#coach'), d = dayOf(k); box.innerHTML = '<span class="mute">le coach lit ta journée…</span>';
  const sample = await getSample();
  if (!sample) { box.innerHTML = '<span class="mute">le coach n’est pas joignable depuis cette vue. le reste de l’app marche sans lui.</span>'; return; }
- const prompt = `tu es le coach intégré d'evolvr, une app où un perso évolue selon la vraie journée du joueur (chaque mission validée donne 30 xp ; le soir il dit si son temps est allé à construire ou à consommer : +50 ou −50 xp ; objectif : valider 70 % de ses missions du jour). voici sa journée en json :\n${JSON.stringify(context(k))}\n\nécris-lui un bilan en français, tout en minuscules, en le tutoyant, ton direct de coach, sans emoji, sans flatterie gratuite : si la journée est molle, dis-le franchement mais sans l'humilier. 4 phrases maximum (70 mots max). cite au moins un chiffre réel. termine par une seule mission concrète pour demain, qui commence par "demain :". réponds uniquement avec le texte.`;
+ const prompt = `tu es le coach intégré d'evolvr, une app où un perso évolue selon la vraie journée du joueur (chaque mission validée donne 30 xp ; le soir il dit si sa journée a été plutôt productive ou plutôt scroll et écrans : +50 ou −50 xp ; objectif : valider 70 % de ses missions du jour). voici sa journée en json :\n${JSON.stringify(context(k))}\n\nécris-lui un bilan en français, tout en minuscules, en le tutoyant, ton direct de coach, sans emoji, sans flatterie gratuite : si la journée est molle, dis-le franchement mais sans l'humilier. 4 phrases maximum (70 mots max). cite au moins un chiffre réel. termine par une seule mission concrète pour demain, qui commence par "demain :". réponds uniquement avec le texte.`;
  try {
   const r = await sample(prompt, { modelTier: 'quick', cache: false, onText: ({ text }) => { box.textContent = text; } });
   d.deb = (r && r.text || box.textContent || '').trim(); box.textContent = d.deb; S.upd = Date.now(); saveLocal(); markDirty(['core', 'm-' + k.slice(0, 7)]);
@@ -734,13 +770,13 @@ async function coach(k) {
 function settings(go) {
  const st = sync.state === 'cloud' ? 'sauvegardé dans ton compte claude, sur tous tes appareils.' : sync.state === 'erreur' ? 'la sauvegarde en ligne a échoué, tes données restent sur cet appareil.' : sync.state === 'plein' ? 'espace de sauvegarde plein.' : HAS_CLAUDE ? 'sauvegardé sur cet appareil uniquement.' : 'sauvegardé sur ce téléphone. sauvegarde de temps en temps (options avancées › sauvegarder).';
  sheet(`<div class="w h2">réglages</div>
-  <label class="l" for="sname">nom du perso</label><input class="inp" id="sname" maxlength="20" value="${esc(S.name)}" autocomplete="off">
+  <label class="l" for="sname">ton nom</label><input class="inp" id="sname" maxlength="20" value="${esc(S.name)}" autocomplete="off">
   <button class="tog" style="margin-top:14px" data-a="missions"><span>mes missions<span class="sm mute" style="display:block;font-weight:500">${S.missions.length} mission${S.missions.length > 1 ? 's' : ''} · ajouter, modifier, supprimer</span></span><span class="mute">›</span></button>
   <div class="sech" style="margin:24px 4px 6px"><span class="w h3">données</span></div><p class="p sm" style="margin:0 4px 12px">${st}</p>
   <details class="adv"><summary class="tog"><span>options avancées</span><span class="mute">›</span></summary>
   <label class="l" for="sreq">objectif du jour</label><select class="inp" id="sreq">${[[.6, 'souple · 60 % des missions'], [.7, 'normal · 70 % des missions'], [.85, 'exigeant · 85 % des missions'], [1, 'parfait · toutes les missions']].map(([v, l]) => `<option value="${v}" ${req() === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
   <label class="l" for="scut">ta journée se termine à</label><select class="inp" id="scut">${[0, 1, 2, 3, 4, 5, 6].map(h => `<option value="${h}" ${cut() === h ? 'selected' : ''}>${h}h du matin</option>`).join('')}</select>
-  <div class="prow" style="margin-top:16px"><button class="pill sm g" data-a="intro">revoir l’intro</button><button class="pill sm g" data-a="demo">voir la démo</button></div>
+  <div class="prow" style="margin-top:16px"><button class="pill sm g" data-a="intro">revoir l’intro</button><button class="pill sm g" data-a="tour">revoir la visite</button></div>
   <div class="prow" style="margin-top:10px"><button class="pill sm g" data-a="export">sauvegarder</button><button class="pill sm g" data-a="import">importer</button></div>
   <button class="pill sm o" style="margin-top:10px;width:100%;color:var(--red)" data-a="wipe">nouveau compte : tout effacer</button></details>
   <button class="pill" style="margin-top:22px" data-a="close">ok</button>`);
@@ -800,7 +836,7 @@ const ACT = {
  },
  import: () => sheet(`<div class="w h2">importer</div><p class="p sm" style="margin:8px 0 12px"><b>choisis ton fichier de sauvegarde, ou colle le texte.</b> ça remplace les données actuelles.</p><input class="inp" type="file" id="impf" accept=".json,application/json,text/plain"><label class="l" for="imp">ou colle ici</label><textarea class="inp" id="imp" style="min-height:140px;font-size:13px"></textarea><div class="prow" style="margin-top:14px"><button class="pill g" data-a="settings">annuler</button><button class="pill" data-a="doimp">importer</button></div>`),
  doimp: async () => { try { const fi = $('#impf'), raw = fi && fi.files && fi.files[0] ? await fi.files[0].text() : $('#imp').value; const o = JSON.parse(raw); if (!o || !Array.isArray(o.missions) || typeof o.days !== 'object' || !o.start) throw 0; S = o; S.upd = Date.now(); S.seen = null; S.lastBackup = Date.now(); memo = null; saveLocal(); markDirty(['core', ...monthsList()]); closeSheet(); boot(); toast('sauvegarde importée'); } catch (e) { toast('ce n’est pas une sauvegarde evolvr valide'); } },
- demo: (d, el) => { if (!S.demo && !el.dataset.arm && Object.keys(S.days).length) { el.dataset.arm = 1; el.textContent = 'remplace tes données ?'; return; } demo(); closeSheet(); setTab('moi'); toast('démo chargée'); },
+ tour: () => { closeSheet(); setTimeout(() => tour(0), 350); },
  real: () => { realStart(); S.upd = Date.now(); saveLocal(); markDirty(['core']); setTab('moi'); toast('c’est parti. jour 1.'); },
  intro: () => { closeSheet(); onboarding(true); },
  wipe: async (d, el) => { if (!el.dataset.arm) { el.dataset.arm = 1; el.textContent = 'sûr ? tout sera effacé'; return; }
@@ -828,13 +864,13 @@ function onboarding(replay) {
  const sheetb = (ill, body) => `<div class="sheetb"><div class="ill">${ill}</div><div class="tx">${body}</div></div>`;
  const steps = [
   () => { ov.innerHTML = frame(`<div class="mid"><div class="w h1 blur-in" id="salut">salut</div></div>`); setTimeout(() => { const s = $('#salut'); if (s) s.className = 'w h1 blur-out'; }, 1300); setTimeout(next, 1900); },
-  () => { ov.innerHTML = frame(`<div style="padding:0 22px calc(28px + env(safe-area-inset-bottom,0px))"><div class="w h1 blur-in">bienvenue à</div><div class="blur-in" style="margin-top:6px">${LOGO(40)}</div><p class="p blur-in" style="margin:18px 4px 24px;animation-delay:.15s"><b>evolvr est le jeu où le perso, c’est toi.</b> chaque chose que tu fais dans la vraie vie le fait évoluer : ton sport, ton taff, ce que tu construis.</p><button class="pill blur-in" style="animation-delay:.3s" data-o="next">allons-y</button></div>`); },
+  () => { ov.innerHTML = frame(`<div style="padding:0 22px calc(28px + env(safe-area-inset-bottom,0px))"><div class="blur-in">${LOGO(40)}</div><div class="w h1 blur-in" style="margin-top:18px;animation-delay:.1s">le jeu où le perso, c’est toi.</div><p class="p blur-in" style="margin:14px 4px 24px;animation-delay:.2s"><b>ce que tu fais dans la vraie vie le fait évoluer :</b> ton sport, ton taff, ce que tu construis.</p><button class="pill blur-in" style="animation-delay:.3s" data-o="next">allons-y</button></div>`); },
   () => { ov.innerHTML = frame(sheetb(avatar({ t: zero, stage: 0, anim: false, id: 'o1' }).replace('viewBox="0 0 240 290"', 'viewBox="20 8 200 278"'), `<p class="p" style="margin-top:0"><b>ton perso part de zéro.</b> il est mou, il se tient mal, il n’a rien construit.</p><p class="p"><b>tu fais ton sport, il prend du muscle.</b> tu bosses sur ton business, son socle monte. tu lâches trois jours, il redescend.</p><button class="pill" data-o="next">j’ai compris</button>`)); },
   () => { ov.innerHTML = frame(sheetb(`<svg viewBox="0 0 200 150"><ellipse cx="100" cy="132" rx="80" ry="10" fill="#111"/>${cube(70, 74, 40)}<g opacity=".55"><rect x="138" y="92" width="26" height="42" rx="6" fill="#0c0c0c" stroke="#777" stroke-width="2"/><rect x="142" y="97" width="18" height="30" rx="3" fill="#555"/></g></svg>`, `<div class="w h2" style="margin-bottom:6px">les règles</div>${RULES()}<p class="p" style="margin-top:14px"><b>rater un jour, ça arrive.</b> deux de suite, ta série repart à zéro.</p><button class="pill" data-o="next">continuer</button>`)); },
-  () => { ov.innerHTML = frame(sheetb(avatar({ t: mid, stage: 3, anim: false, id: 'o2', mood: 'c' }).replace('viewBox="0 0 240 290"', 'viewBox="20 8 200 278"'), `<div class="w h2">comment il s’appelle ?</div><p class="p" style="margin:10px 0 14px">tu pourras le changer plus tard.</p><input class="inp w" id="oname" maxlength="20" value="${replay ? esc(name) : ''}" placeholder="nom" style="font-size:20px;margin-bottom:14px" autocomplete="off"><button class="pill" data-o="name">continuer</button>`)); setTimeout(() => { const i = $('#oname'); if (i) i.focus(); }, 500); },
+  () => { ov.innerHTML = frame(sheetb(avatar({ t: mid, stage: 3, anim: false, id: 'o2', mood: 'c' }).replace('viewBox="0 0 240 290"', 'viewBox="20 8 200 278"'), `<div class="w h2">tu t’appelles comment&nbsp;?</div><p class="p" style="margin:10px 0 14px">tu pourras le changer plus tard.</p><input class="inp w" id="oname" maxlength="20" value="${replay ? esc(name) : ''}" placeholder="nom" style="font-size:20px;margin-bottom:14px" autocomplete="off"><button class="pill" data-o="name">continuer</button>`)); setTimeout(() => { const i = $('#oname'); if (i) i.focus(); }, 500); },
   () => renderMis(),
   () => { ov.innerHTML = frame(`<div class="sheetb"><div class="solo"><svg width="56" height="56" viewBox="0 0 56 56" style="display:block;margin-bottom:22px"><circle cx="28" cy="28" r="22" fill="none" stroke="#3a3a3a" stroke-width="5"/><g class="spin-r" style="transform-origin:28px 28px"><path d="M28 6a22 22 0 0 1 22 22" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/></g></svg><div class="w h2">mettre les choses en place</div></div></div>`); setTimeout(next, 2200); },
-  () => { ov.innerHTML = frame(`<div class="sheetb"><div class="tx" style="background:#1b1b1b"><div class="w h2">configuration terminée</div><p class="p">passons à l’action en commençant ta première journée.</p><div class="prow"><button class="pill g" data-o="demo">voir la démo</button><button class="pill" data-o="go">commencer</button></div></div></div>`); }];
+  () => { ov.innerHTML = frame(`<div class="sheetb"><div class="tx" style="background:#1b1b1b"><div class="w h2">c’est prêt</div><p class="p">on te montre l’app en 30 secondes, puis à toi de jouer.</p><button class="pill" data-o="go">c’est parti</button></div></div>`); }];
  function renderMis() {
   const have = new Set(ms.map(m => m.n.toLowerCase())), keep = $('#ocust') ? $('#ocust').value : '';
   const mine = ms.filter(m => !LIB.some(([, it]) => it.some(x => x[0].toLowerCase() === m.n.toLowerCase())));
@@ -847,12 +883,11 @@ function onboarding(replay) {
  }
  let i = replay ? 1 : 0;
  function next() { i++; if (steps[i]) steps[i](); }
- function finish(withDemo) {
+ function finish(withTour) {
   ms.forEach(m => { if (!m.off) delete m.off; });
   if (!S || !replay) { fresh(name, ms); S.seen = snapshotLv(C()); } else { S.name = name; S.missions = ms; }
-  if (withDemo) demo();
   S.upd = Date.now(); memo = null; saveLocal(); markDirty(['core', ...monthsList()]);
-  ov.removeEventListener('click', h); ov.innerHTML = ''; boot();
+  ov.removeEventListener('click', h); ov.innerHTML = ''; boot(); if (withTour) setTimeout(() => tour(0), 500);
  }
  const h = e => { const b = e.target.closest('[data-o]'); if (!b) return; const o = b.dataset.o; buzz();
   if (o === 'next') next();
@@ -862,7 +897,7 @@ function onboarding(replay) {
   else if (o === 'cst') { cst = b.dataset.k; renderMis(); }
   else if (o === 'cadd') { const inp = $('#ocust'), n = inp.value.trim().slice(0, 40); if (!n) { inp.focus(); return; } if (ms.length < MAXM) ms.push({ id: uid(), n, type: 'check', stat: cst, days: ALL.slice() }); inp.value = ''; renderMis(); }
   else if (o === 'mgo') { if (ms.length) next(); }
-  else if (o === 'demo') finish(true); else if (o === 'go') finish(false); };
+  else if (o === 'go') finish(true); };
  ov.addEventListener('click', h);
  ov.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'ocust') { e.preventDefault(); const b2 = ov.querySelector('[data-o=cadd]'); if (b2) b2.click(); return; } if (e.key === 'Enter' && e.target.id === 'oname') { e.preventDefault(); const b = ov.querySelector('[data-o=name]'); if (b) b.click(); } });
  steps[i]();
@@ -881,7 +916,6 @@ function boot() {
  memo = null; checkLevels(); render();
 }
 if (S && S.missions && S.start) boot(); else { S = null; onboarding(false); }
-setTimeout(() => { const bt = document.getElementById('boot'); if (bt) { bt.style.opacity = '0'; setTimeout(() => bt.remove(), 400); } }, 350);
 if (!HAS_CLAUDE) { try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {} if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {}); }
 startSync();
 })();
