@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="evolvr">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<title>evolvr</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE  pushr : noir total, minuscules, tutoiement, sec et motivant
+   IDEA   un jeu vidéo dont le perso, c'est toi : ta vraie journée = son xp
+   PICTURE le perso chromé au centre, qui prend du muscle, une aura de build, une posture
+   COLOUR noir #000, feuilles #1b1b1b, blanc cassé #f4f4f4, gris #8c8c8c, rouge seulement pour l'atrophie
+   TYPE   Archivo étendu 800 pour les titres, SF / Inter pour le texte
+   LAYOUT mobile d'abord, colonne de 520px max, nav en pilule flottante en bas */
+:root{color-scheme:dark;--bg:#000;--s1:#111;--s2:#1b1b1b;--s3:#262626;--s4:#333;--ln:#232323;--ink:#f4f4f4;--mute:#8c8c8c;--dim:#555;--red:#ff453a}
+:root[data-theme=light],:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;background:#000;color:var(--ink)}
+body{font:16px/1.42 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,"Segoe UI",system-ui,sans-serif;overflow-x:clip;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.w{font-family:Archivo,"Arial Black",sans-serif;font-stretch:125%;font-variation-settings:"wdth" 125;font-weight:800;letter-spacing:-.01em;line-height:1.04}
+.h1{font-size:34px}.h2{font-size:24px}.h3{font-size:19px}
+.mute{color:var(--mute)}.dim{color:var(--dim)}.sm{font-size:13px}.red{color:var(--red)}
+.p b{color:var(--ink);font-weight:600}.p{color:var(--mute);font-weight:500;margin:0}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+#app{max-width:520px;margin:0 auto;min-height:100%;padding:calc(env(safe-area-inset-top,0px) + 10px) max(16px,env(safe-area-inset-right,0px)) calc(118px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.top{display:flex;align-items:center;gap:10px;height:52px}
+.top .logo{height:26px;width:auto;flex:none}
+.top .sp{flex:1}
+.ib{width:44px;height:44px;border-radius:22px;display:grid;place-items:center;background:var(--s2)}
+.tabs{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(488px,calc(100% - 28px));height:62px;border-radius:31px;background:rgba(30,30,30,.82);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:6px;z-index:20;border:1px solid #2a2a2a}
+.tabs button{border-radius:25px;color:var(--mute);font-weight:700;font-size:15px}
+.tabs button.on{background:#fff;color:#000}
+.card{background:var(--s1);border-radius:26px;padding:18px}
+.sec{margin-top:26px}
+.sech{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 4px 12px}
+.pill{display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;border-radius:28px;background:#f2f2f2;color:#000;font-weight:700;font-size:17px;padding:0 22px;transition:transform .12s}
+.pill:active{transform:scale(.97)}
+.pill.g{background:#363636;color:#a4a4a4}
+.pill.o{background:transparent;color:var(--ink);border:1.5px solid #333}
+.pill.sm{min-height:44px;font-size:15px;width:auto;white-space:nowrap;padding:0 10px}
+.prow{display:flex;gap:10px}.prow>*{flex:1}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:40px;padding:0 15px;border-radius:20px;background:var(--s2);color:var(--mute);font-weight:600;font-size:15px;display:inline-flex;align-items:center;gap:6px}
+.chip.on{background:#fff;color:#000}
+.bar{height:6px;border-radius:3px;background:#262626;overflow:hidden}
+.bar i{display:block;height:100%;background:#fff;border-radius:3px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.bar.r i{background:var(--red)}
+/* hero */
+.hero{position:relative;border-radius:30px;overflow:hidden;background:radial-gradient(120% 70% at 50% 34%,#1d1d1d 0,#0b0b0b 58%,#050505 100%);padding:0 18px 20px}
+.hero .av{padding-top:44px;height:clamp(330px,90vw,410px);display:flex;justify-content:center;margin:0 -18px}
+.hero .av svg{height:100%;width:auto}
+.hero .who{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:-6px}
+.hero .lv{text-align:right}
+.hero .lv b{display:block;font-size:44px;line-height:1}
+.say{position:absolute;top:16px;left:18px;right:18px;z-index:1}
+.say span{display:inline-block;max-width:88%;background:#fff;color:#000;padding:9px 14px;border-radius:18px 18px 18px 5px;font-weight:600;font-size:14px;line-height:1.3;animation:pop .5s cubic-bezier(.2,.9,.3,1.2) both}
+.today{display:block;width:100%;text-align:left;margin-top:10px}
+.today .big2{font-size:38px;line-height:1;margin:8px 0 12px}
+.today .big2 small{font-size:16px;color:var(--mute)}
+.today .ft{display:flex;justify-content:space-between;gap:10px;margin-top:10px;font-size:14px;font-weight:600;color:var(--mute)}
+.fx{white-space:nowrap;position:fixed;z-index:70;pointer-events:none;transform:translate(-50%,-50%);font-family:Archivo,"Arial Black",sans-serif;font-stretch:125%;font-weight:800;font-size:20px;color:#fff;text-shadow:0 2px 12px #000;animation:fx .9s ease-out forwards}
+.fx.neg{color:var(--red)}
+@keyframes fx{0%{opacity:0;transform:translate(-50%,-30%) scale(.7)}20%{opacity:1;transform:translate(-50%,-80%) scale(1.1)}100%{opacity:0;transform:translate(-50%,-230%) scale(1)}}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+.kpi{background:var(--s1);border-radius:22px;padding:14px 14px 12px}
+.kpi b{display:block;font-size:24px}
+.kpi span{font-size:13px;color:var(--mute);font-weight:600}
+.srow{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 4px;border-bottom:1px solid var(--ln)}
+.srow:last-child{border-bottom:0}
+.srow .t{display:flex;justify-content:space-between;gap:8px;margin-bottom:7px;font-weight:600}
+.srow .lvn{font-size:20px;text-align:right;min-width:48px}
+.ic{width:44px;height:44px;border-radius:14px;background:var(--s2);display:grid;place-items:center}
+.ic svg{width:30px;height:30px}
+/* boss */
+.boss{display:grid;grid-template-columns:96px minmax(0,1fr);gap:14px;align-items:center}
+.boss svg{width:96px;height:96px}
+/* jour */
+.dnav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 14px}
+.dnav .ib[disabled]{opacity:.3}
+.dayhead{display:grid;grid-template-columns:120px minmax(0,1fr);gap:16px;align-items:center}
+.ring{position:relative;width:120px;height:120px}
+.ring svg{width:120px;height:120px;transform:rotate(-90deg)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:26px}
+.mis{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--s1);border-radius:22px;padding:12px 12px 12px 12px;margin-bottom:8px;transition:background .2s}
+.mis.on{background:#191919}
+.mis.ro{cursor:default}
+.bopt[disabled]{cursor:default}
+.mis .chk.on{animation:pop .35s cubic-bezier(.2,.9,.3,1.3)}
+.mis .mn{font-weight:600;font-size:16px}
+.mis.on .mn{color:var(--mute);text-decoration:line-through;text-decoration-color:#555}
+.mis .ms{font-size:13px;color:var(--mute);margin-top:1px}
+.mis .bar{margin-top:8px}
+.chk{width:44px;height:44px;border-radius:22px;border:2px solid #3a3a3a;display:grid;place-items:center;transition:all .2s}
+.chk.on{background:#fff;border-color:#fff}
+.cnt{display:flex;align-items:center;gap:4px}
+.cnt button.s{width:38px;height:44px;border-radius:14px;background:var(--s2);font-size:22px;font-weight:600;color:#ddd}
+.cnt button.v{min-width:58px;height:44px;font-weight:700;font-size:15px;text-align:center}
+.quest{border:1.5px dashed #333;background:transparent}
+/* build */
+.ratio{padding:22px 18px 18px;border-radius:30px;background:radial-gradient(90% 90% at 80% 0%,#202020,#0c0c0c 70%)}
+.bal .balfig{display:flex;justify-content:center;margin:6px -6px 4px}
+.balfig svg{width:100%;max-width:340px;height:auto}
+.balfig svg.dim{opacity:.55}
+.g3b{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.bopt{min-height:64px;border-radius:20px;background:#222;color:var(--mute);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 6px;text-align:center;transition:transform .12s}
+.bopt:active{transform:scale(.96)}
+.bopt b{font-size:14px;font-weight:700;color:#ddd;line-height:1.15}
+.bopt span{font-size:13px;font-weight:600}
+.bopt.on{background:#fff;color:#555}.bopt.on b{color:#000}
+.duel{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.duel b{display:block;font-size:clamp(34px,11vw,50px);line-height:1}
+.duel span{font-size:13px;color:var(--mute);font-weight:600}
+.duel .r{text-align:right}.duel .r b{color:#8c8c8c}
+.rule{display:grid;grid-template-columns:58px minmax(0,1fr);gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--ln);color:var(--mute);font-size:15px}
+.rule b{font-size:20px;text-align:right;color:var(--ink)}
+.rule span b{font-size:15px;font-family:inherit;font-stretch:100%;font-variation-settings:normal;text-align:left;font-weight:700}
+.reg{display:grid;grid-template-columns:minmax(0,1fr) auto 40px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--ln);font-weight:600;font-size:15px}
+.reg span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.reg b{text-align:right;font-size:14px}
+.dots{display:flex;gap:5px}
+.dots i{width:16px;height:16px;border-radius:5px;background:#262626;display:block}
+.dots i.on{background:#f4f4f4}
+.dots i.na{background:transparent;border:1.5px dashed #2c2c2c}
+.dots i.lb{background:none;font-style:normal;font-size:12px;color:var(--mute);text-align:center;height:auto}
+.reg.hd{padding:0 0 4px}
+.rc{display:flex;justify-content:space-between;gap:10px;font-size:15px;font-weight:600;padding:3px 0}
+.rc span{color:var(--mute)}
+.neg{color:var(--red)!important}
+.rtx{flex-direction:column;gap:0;font-size:24px!important;display:flex!important;align-items:center;justify-content:center;line-height:1.1}
+.rtx span{font-family:-apple-system,BlinkMacSystemFont,Inter,sans-serif;font-stretch:100%;font-size:12px;color:var(--mute);font-weight:600}
+.split{height:10px;border-radius:5px;background:#2c2c2c;overflow:hidden;display:flex;margin-top:16px}
+.split i{background:#fff;display:block;height:100%}
+.logl{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 2px;border-bottom:1px solid var(--ln)}
+.logl:last-child{border-bottom:0}
+.logl .x{width:36px;height:36px;border-radius:18px;background:var(--s2);color:var(--mute);font-size:18px}
+.proj{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;padding:14px 2px;border-bottom:1px solid var(--ln)}
+.proj:last-child{border-bottom:0}
+.inp{width:100%;min-height:52px;border-radius:18px;background:var(--s2);border:1.5px solid #2c2c2c;padding:12px 16px;font-size:16px;outline:0}
+.inp:focus{border-color:#666}
+textarea.inp{min-height:96px;resize:vertical;line-height:1.45}
+select.inp{appearance:none;-webkit-appearance:none;padding-right:40px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+label.l{display:block;font-size:13px;font-weight:600;color:var(--mute);margin:14px 4px 7px}
+/* evo */
+.fig{position:relative;height:190px}
+.fig>svg{position:absolute;inset:0;width:100%;height:100%}
+.fig.rad{height:300px}
+.heat{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,1fr);gap:4px;overflow-x:auto;padding-bottom:4px}
+.heat i{width:16px;height:16px;border-radius:5px;background:#1c1c1c;display:block}
+.tl{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px}
+.tl div{text-align:center;background:var(--s1);border-radius:20px;padding:6px 4px 10px}
+.tl svg{width:100%;height:150px}
+.tots{display:grid;grid-template-columns:repeat(auto-fit,minmax(9em,1fr));gap:10px}
+.ach{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.ach div{text-align:center;font-size:13px;font-weight:600;line-height:1.2}
+.ach svg{width:100%;max-width:70px;aspect-ratio:1;display:block;margin:0 auto 6px}
+.ach .lk{opacity:.28}
+/* sheet */
+#sw{position:fixed;inset:0;z-index:50;pointer-events:none}
+#sw .scrim{position:absolute;inset:0;background:rgba(0,0,0,.6);opacity:0;transition:opacity .3s}
+#sw .sheet{position:absolute;left:50%;bottom:0;width:min(520px,100%);transform:translate(-50%,105%);transition:transform .38s cubic-bezier(.2,.85,.25,1);background:#141414;border-radius:30px 30px 0 0;max-height:92%;overflow:auto;padding:10px 18px calc(24px + env(safe-area-inset-bottom,0px));overscroll-behavior:contain}
+#sw.on{pointer-events:auto}#sw.on .scrim{opacity:1}#sw.on .sheet{transform:translate(-50%,0)}
+.grab{width:40px;height:5px;border-radius:3px;background:#3a3a3a;margin:0 auto 14px}
+.coach{background:var(--s2);border-radius:22px;padding:16px;white-space:pre-wrap;line-height:1.5}
+#toast{position:fixed;left:16px;right:16px;margin:0 auto;width:fit-content;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translateY(20px);opacity:0;transition:all .3s;z-index:40;background:#fff;color:#000;border-radius:22px;padding:11px 8px 11px 18px;font-weight:700;font-size:15px;display:flex;gap:12px;align-items:center;pointer-events:none;max-width:calc(100% - 32px)}
+#toast.on{opacity:1;transform:none;pointer-events:auto}
+#toast button{white-space:nowrap;flex:none;background:#000;color:#fff;border-radius:16px;padding:7px 12px;font-size:13px;font-weight:700}
+#toast span{padding-right:10px}
+/* level up + onboarding */
+.full{position:fixed;inset:0;z-index:60;background:#000;display:flex;flex-direction:column;overflow:hidden}
+.blob{position:absolute;left:50%;top:-8%;width:130%;height:58%;transform:translateX(-50%);background:radial-gradient(closest-side,#1f1f1f,#101010 55%,rgba(0,0,0,0) 100%);border-radius:46% 54% 50% 50%/52% 46% 54% 48%;animation:morph 9s ease-in-out infinite alternate;pointer-events:none}
+.ob{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;max-width:520px;margin:0 auto;padding-bottom:env(safe-area-inset-bottom,0px)}
+.ob .mid{position:absolute;left:0;right:0;top:44%;padding:0 32px}
+.ob .sheetb{border-radius:28px 28px 0 0;overflow:hidden;animation:up .5s cubic-bezier(.2,.85,.25,1) both}
+.ob .ill{background:#1c1c1c;height:168px;display:grid;place-items:center;overflow:hidden}
+.ob .ill svg{height:150px;width:auto}
+.ob .tx{background:#07090a;padding:22px 22px calc(26px + env(safe-area-inset-bottom,0px))}
+.ob .tx .p{margin:14px 0 22px;font-size:16px}
+.ob .solo{background:#1b1b1b;padding:40px 24px 60px}
+.blur-in{animation:blurin .9s cubic-bezier(.2,.8,.2,1) both}
+.blur-out{animation:blurout .6s ease both}
+.spin-r{animation:sp 1s linear infinite;transform-origin:center}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding:6px 4px;border-bottom:1px solid #1e1e1e;font-weight:600;width:100%;text-align:left}
+.sw{width:50px;height:30px;border-radius:15px;background:#333;position:relative;flex:none;transition:background .2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:12px;background:#888;transition:all .2s}
+.on>.sw{background:#fff}.on>.sw::after{left:23px;background:#000}
+.adv summary{list-style:none;cursor:pointer}.adv summary::-webkit-details-marker{display:none}.adv[open] summary .mute{transform:rotate(90deg)}
+.lvbig{font-size:clamp(44px,15vw,68px)}
+.banner{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--s2);border-radius:18px;padding:10px 10px 10px 16px;margin-bottom:12px;font-size:14px;font-weight:600;color:var(--mute)}
+@keyframes morph{0%{border-radius:46% 54% 50% 50%/52% 46% 54% 48%;transform:translateX(-50%) scale(1)}100%{border-radius:56% 44% 42% 58%/44% 58% 42% 56%;transform:translateX(-50%) scale(1.08) translateY(3%)}}
+@keyframes blurin{from{opacity:0;filter:blur(14px);transform:translateY(8px)}to{opacity:1;filter:blur(0);transform:none}}
+@keyframes blurout{to{opacity:0;filter:blur(14px)}}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+@keyframes sp{to{transform:rotate(360deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes breathe{from{transform:translateY(0)}to{transform:translateY(-2.5px)}}
+@keyframes pulse{0%{opacity:.9;transform:scale(.96)}100%{opacity:.25;transform:scale(1.06)}}
+@keyframes blink{50%{opacity:.25}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+.av .spin{transform-origin:120px 150px;animation:spin 60s linear infinite}
+.av .spin2{transform-origin:120px 150px;animation:spin 34s linear infinite reverse}
+.av .br{animation:breathe 2.4s ease-in-out infinite alternate}
+.av .pl{transform-origin:120px 76px;animation:pulse 2.8s ease-out infinite alternate}
+.lvav{display:flex;justify-content:center}.lvav svg{height:100%;width:auto}
+.pop{animation:pop .6s cubic-bezier(.2,.9,.3,1.2) both}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+@media (min-width:700px){.h1{font-size:40px}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <linearGradient id="gW" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#9c9c9c"/></linearGradient>
+  <linearGradient id="gM" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d2d2d2"/><stop offset="1" stop-color="#626262"/></linearGradient>
+  <linearGradient id="gD" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d7d7d"/><stop offset="1" stop-color="#2c2c2c"/></linearGradient>
+  <linearGradient id="cT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d0d0d0"/></linearGradient>
+  <linearGradient id="cL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c4c4c4"/><stop offset="1" stop-color="#8a8a8a"/></linearGradient>
+  <linearGradient id="cR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7c7c7c"/><stop offset="1" stop-color="#424242"/></linearGradient>
+  <radialGradient id="hd" cx=".36" cy=".3" r=".8"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#e2e2e2"/><stop offset="1" stop-color="#8d8d8d"/></radialGradient>
+  <radialGradient id="fl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#2a2a2a"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+  <radialGradient id="bossG" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#3a3a3a"/><stop offset=".7" stop-color="#121212"/><stop offset="1" stop-color="#050505"/></radialGradient>
+  <filter id="gl" x="-4%" y="-30%" width="108%" height="160%">
+   <feTurbulence type="fractalNoise" baseFrequency="0.0015 0.42" numOctaves="1" seed="7" result="n"/>
+   <feColorMatrix in="n" type="matrix" values="1 0 0 0 0  0 0 0 0 .5  0 0 0 0 0  0 0 0 0 1" result="m"/>
+   <feDisplacementMap in="SourceGraphic" in2="m" scale="9" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+ </defs>
+</svg>
+
+<div id="app" hidden>
+ <header class="top">
+  <svg class="logo" viewBox="0 0 150 34" aria-label="evolvr"><text x="2" y="27" fill="#f4f4f4" filter="url(#gl)" class="w" style="font-size:29px">evolvr</text></svg>
+  <span class="sp"></span>
+  <button class="ib" data-a="settings" aria-label="réglages"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.6M12 18.6v2.6M21.2 12h-2.6M5.4 12H2.8M18.5 5.5l-1.8 1.8M7.3 16.7l-1.8 1.8M18.5 18.5l-1.8-1.8M7.3 7.3 5.5 5.5"/></svg></button>
+ </header>
+ <div id="demo"></div>
+ <main id="view"></main>
+</div>
+<nav class="tabs" id="tabs" hidden aria-label="navigation">
+ <button data-a="tab" data-t="moi">perso</button>
+ <button data-a="tab" data-t="jour">aujourd’hui</button>
+ <button data-a="tab" data-t="evo">évo</button>
+</nav>
+<div id="sw"><div class="scrim" data-a="close"></div><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+<div id="toast"><span id="tmsg"></span><button id="tund" hidden>annuler</button></div>
+<div id="over"></div>
+
+<script>
+(() => {
+'use strict';
+/* ---------- utils ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2, '0');
+const dkey = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const pk = k => { const [y,m,d] = k.split('-').map(Number); return new Date(y, m-1, d, 12); };
+const addD = (k, n) => { const d = pk(k); d.setDate(d.getDate()+n); return dkey(d); };
+const diffD = (a, b) => Math.round((pk(b) - pk(a)) / 864e5);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const fmt = n => Math.round(n).toLocaleString('fr-FR');
+const uid = () => Math.random().toString(36).slice(2, 9);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const buzz = () => { try { navigator.vibrate && navigator.vibrate(8); } catch (e) {} };
+const JOURS = ['dim','lun','mar','mer','jeu','ven','sam'];
+const MOIS = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+const dLabel = k => { const d = pk(k); return `${JOURS[d.getDay()]} ${d.getDate()} ${MOIS[d.getMonth()]}`; };
+const hm = m => m >= 60 ? `${Math.floor(m/60)}h${m%60 ? pad(Math.round(m%60)) : ''}` : `${Math.round(m)} min`;
+
+/* ---------- modèle ---------- */
+const STATS = [
+ {k:'force', n:'force', sub:'muscu · pompes'},
+ {k:'cardio', n:'cardio', sub:'pas · course'},
+ {k:'build', n:'build', sub:'créer · bosser'},
+ {k:'focus', n:'focus', sub:'deep work · lecture'},
+ {k:'disc', n:'discipline', sub:'routines · sommeil'},
+ {k:'chari', n:'charisme', sub:'appels · closing'}];
+const SN = Object.fromEntries(STATS.map(s => [s.k, s.n]));
+const ALL = [0,1,2,3,4,5,6];
+const DEF_M = () => [
+ {id:'pompes', n:'100 pompes', type:'check', stat:'force', xp:40, days:ALL.slice()},
+ {id:'muscu', n:'séance muscu', type:'check', stat:'force', xp:60, days:[1,3,5]},
+ {id:'pas', n:'8 000 pas', type:'check', stat:'cardio', xp:35, days:ALL.slice()},
+ {id:'appels', n:'appels de prospection', type:'check', stat:'chari', xp:45, days:[1,2,3,4,5]},
+ {id:'lecture', n:'lecture 20 min', type:'check', stat:'focus', xp:25, days:ALL.slice()},
+ {id:'noscroll', n:'zéro scroll avant midi', type:'check', stat:'disc', xp:30, days:ALL.slice()},
+ {id:'dodo', n:'couché avant 1h', type:'check', stat:'disc', xp:30, days:ALL.slice()}];
+const STAGES = ['npc','rookie','grinder','builder','operator','titan','légende'];
+const STAGE_AT = [1,2,4,6,9,14,20];
+const MATS = [['argile','#8e8e8e','#474747'],['graphite','#a6a6a6','#545454'],['acier','#c3c3c3','#676767'],['aluminium','#dcdcdc','#828282'],['titane','#ececec','#9a9a9a'],['céramique','#f8f8f8','#b9b9b9'],['lumière','#ffffff','#d4d4d4']];
+const STAGE_TXT = ['il attend que tu bouges.','il commence à y croire.','il serre les dents chaque jour.','il construit, brique par brique.','il exécute sans négocier.','plus rien ne le ralentit.','il est devenu ce que tu disais.'];
+const LS = 'evolvr.v1';
+const HAS_CLAUDE = !!(window.claude && window.claude.use);
+let S = null;
+try { const r = localStorage.getItem(LS); if (r) S = JSON.parse(r); } catch (e) { S = null; }
+const ui = { tab: 'moi', day: null, undo: null };
+
+const cut = () => (S && S.set && Number.isFinite(S.set.cut)) ? S.set.cut : 4;
+const todayK = () => dkey(new Date(Date.now() - cut() * 36e5));
+const dayOf = k => (S.days[k] ||= { m: {}, l: [], s: [] });
+
+/* ---------- calcul ---------- */
+const BAL_XP = 50;
+const req = () => (S && S.set && S.set.req) || .7;
+const MAXM = 12;
+function dayCalc(k) {
+ const d = S.days[k] || {}; const wd = pk(k).getDay();
+ const xp = {}; STATS.forEach(s => xp[s.k] = 0);
+ const bal = d.b === 1 || d.b === 0 || d.b === -1 ? d.b : null, bx = bal === 1 ? BAL_XP : bal === -1 ? -BAL_XP : 0;
+ let mis = 0, done = 0; const ms = [];
+ S.missions.forEach(m => {
+  if (m.off || !m.days.includes(wd)) return;
+  const on = !!(d.m && d.m[m.id]), x = on ? m.xp : 0;
+  xp[m.stat] += x; mis += x; if (on) done++; ms.push({ m, on, x });
+ });
+ xp.build += bx;
+ const possible = ms.reduce((a, x) => a + x.m.xp, 0) + BAL_XP, G = Math.max(30, Math.round(req() * possible / 10) * 10), sum = mis + bx;
+ return { k, xp, sum, bal, bx, mis, done, ms, G, possible, comp: clamp(sum / G, 0, 1), valid: sum >= G, perfect: ms.length > 0 && done === ms.length, d };
+}
+const thS = L => 40 * Math.pow(L - 1, 1.7);
+const lvS = x => clamp(Math.floor(1 + Math.pow(Math.max(0, x) / 40, 1 / 1.7)), 1, 99);
+const thG = L => 150 * Math.pow(L - 1, 1.6);
+const lvG = x => clamp(Math.floor(1 + Math.pow(Math.max(0, x) / 150, 1 / 1.6)), 1, 199);
+const stageOf = L => { let s = 0; STAGE_AT.forEach((a, i) => { if (L >= a) s = i; }); return s; };
+const weekStart = k => { const d = pk(k); const w = (d.getDay() + 6) % 7; return addD(k, -w); };
+
+const activeStats = () => { const a = new Set(S.missions.filter(m => !m.off).map(m => m.stat)); a.add('build'); return a; };
+function compute(upto) {
+ const act = activeStats();
+ const xp = {}, last = {}; STATS.forEach(s => { xp[s.k] = 0; last[s.k] = S.start; });
+ const T = todayK(); const A = { validDays: 0, best: 0, missions: 0, buildDays: 0, consoDays: 0, perfect: 0 };
+ let run = 0, miss = 0;
+ for (let k = S.start, i = 0; k <= upto && i < 3000; k = addD(k, 1), i++) {
+  const b = dayCalc(k);
+  STATS.forEach(s => { xp[s.k] = Math.max(0, xp[s.k] + b.xp[s.k]); if (b.xp[s.k] >= 5) last[s.k] = k; });
+  if (b.valid) { A.validDays++; run++; miss = 0; A.best = Math.max(A.best, run); } else if (k < T && ++miss >= 2) run = 0;
+  A.missions += b.done; if (b.perfect) A.perfect++; if (b.bal === 1) A.buildDays++; if (b.bal === -1) A.consoDays++;
+  if (k < T) STATS.forEach(s => { if (act.has(s.k) && diffD(last[s.k], k) >= 3) xp[s.k] *= .975; });
+ }
+ const lv = {}, t = {}, prog = {}; let total = 0;
+ STATS.forEach(s => { const L = lvS(xp[s.k]); lv[s.k] = L; t[s.k] = 1 - Math.pow(1 - clamp((L - 1 + (xp[s.k] - thS(L)) / (thS(L + 1) - thS(L))) / 24, 0, 1), 1.8);
+  prog[s.k] = (xp[s.k] - thS(L)) / (thS(L + 1) - thS(L)); total += xp[s.k]; });
+ const glv = lvG(total), stage = stageOf(glv);
+ return { xp, last, lv, t, prog, total, glv, stage, gp: (total - thG(glv)) / (thG(glv + 1) - thG(glv)), gnext: thG(glv + 1), A };
+}
+let memo = null;
+const C = () => memo || (memo = compute(todayK()));
+function streak() {
+ const T = todayK(); let k = dayCalc(T).valid ? T : addD(T, -1), n = 0, miss = 0;
+ for (let i = 0; k >= S.start && i < 3000; i++, k = addD(k, -1)) { if (dayCalc(k).valid) { n++; miss = 0; } else if (++miss >= 2) break; }
+ return n;
+}
+const danger = () => { const T = todayK(), y = addD(T, -1); return y >= S.start && !dayCalc(T).valid && !dayCalc(y).valid && streak() > 0; };
+const editable = k => k >= addD(todayK(), -1);
+const moodOf = b => b.bal === -1 ? 'k' : b.bal === 1 ? 'c' : 'n';
+
+/* ---------- dessins ---------- */
+function cube(x, y, s) {
+ const h = s * .58;
+ return `<g><path d="M${x} ${y-s}L${x+s} ${y-s+h}L${x} ${y-s+2*h}L${x-s} ${y-s+h}Z" fill="url(#cT)"/><path d="M${x-s} ${y-s+h}L${x} ${y-s+2*h}L${x} ${y+s}L${x-s} ${y+s-h}Z" fill="url(#cL)"/><path d="M${x+s} ${y-s+h}L${x} ${y-s+2*h}L${x} ${y+s}L${x+s} ${y+s-h}Z" fill="url(#cR)"/></g>`;
+}
+const ICON = {
+ force: `<svg viewBox="0 0 32 32"><rect x="8" y="14.3" width="16" height="3.4" rx="1.7" fill="url(#gM)"/><rect x="3.5" y="8" width="5.5" height="16" rx="2.4" fill="url(#gW)"/><rect x="23" y="8" width="5.5" height="16" rx="2.4" fill="url(#gM)"/><rect x="1" y="11.5" width="3" height="9" rx="1.5" fill="url(#gD)"/><rect x="28" y="11.5" width="3" height="9" rx="1.5" fill="url(#gD)"/></svg>`,
+ cardio: `<svg viewBox="0 0 32 32"><path d="M16 27.5C9 22.4 3.5 18 3.5 11.6 3.5 7.6 6.6 4.8 10.2 4.8c2.6 0 4.6 1.4 5.8 3.4 1.2-2 3.2-3.4 5.8-3.4 3.6 0 6.7 2.8 6.7 6.8 0 6.4-5.5 10.8-12.5 15.9Z" fill="url(#gW)"/><path d="M5 15.5h6l2-4 3.4 8 2.2-4.5H27" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+ build: `<svg viewBox="0 0 32 32">${cube(16, 16, 12)}</svg>`,
+ focus: `<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#gD)"/><circle cx="16" cy="16" r="9" fill="url(#gW)"/><circle cx="16" cy="16" r="4.6" fill="#141414"/><circle cx="14.6" cy="14.6" r="1.4" fill="#fff"/></svg>`,
+ disc: `<svg viewBox="0 0 32 32"><path d="M16 3 27 7v8.2c0 6.7-4.6 11.4-11 13.8C9.6 26.6 5 21.9 5 15.2V7Z" fill="url(#gW)"/><path d="M16 3v26C9.6 26.6 5 21.9 5 15.2V7Z" fill="#fff" opacity=".35"/><path d="m10.8 15.8 3.6 3.6 7-7.4" fill="none" stroke="#1a1a1a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+ chari: `<svg viewBox="0 0 32 32"><path d="M4 12.5h5l9-6v19l-9-6H4Z" fill="url(#gW)"/><rect x="5" y="19" width="4" height="7" rx="1.6" fill="url(#gM)"/><path d="M22 11.5a6.4 6.4 0 0 1 0 9M25.4 8.2a11 11 0 0 1 0 15.6" fill="none" stroke="url(#gM)" stroke-width="2.4" stroke-linecap="round"/></svg>`};
+const g = v => `rgb(${v},${v},${v})`;
+const hx2 = h => parseInt(h.slice(1, 3), 16);
+const mixG = (a, b, t) => g(Math.round(hx2(a) + (hx2(b) - hx2(a)) * clamp(t, 0, 1)));
+const seg = (cx, y, w, h, ang, fill) => `<rect x="${(cx - w / 2).toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" rx="${(w / 2).toFixed(1)}" fill="${fill}"${ang ? ` transform="rotate(${ang} ${cx.toFixed(1)} ${y.toFixed(1)})"` : ''}/>`;
+function avatar(o) {
+ const t = o.t, s = o.stage, an = o.anim !== false, mood = o.mood || 'n', id = o.id || 'a';
+ const tf = t.force, tc = t.cardio, tb = t.build, tfo = t.focus, td = t.disc, tch = t.chari, sl = 1 - td, cx = 120, f = v => (+v).toFixed(1);
+ const [, Lc, Dc] = MATS[s];
+ const n = 1 + Math.round(tb * 6), step = 8, feetY = 266 - n * step - 1;
+ const legW = 14 + 7 * tf + 2 * tc, legH = 80, gap = 4;
+ const tw = 2 * legW + gap + 4 + 16 * tf - 4 * tc, th = 64 - 6 * sl;
+ const torsoB = feetY - legH - 3, torsoT = torsoB - th;
+ const aw = 11 + 7 * tf, ah = 68 - 4 * sl, aT = torsoT + 2 + 4 * sl, aX = tw / 2 + 3 + aw / 2;
+ const hr = 18, hy = torsoT - 5 - hr + 7 * sl + (mood === 'k' ? 5 : 0);
+ const M = `url(#M${id})`, P = `url(#P${id})`;
+ let out = `<svg viewBox="0 0 240 290" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ton perso"><defs>
+<linearGradient id="M${id}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${Lc}"/><stop offset=".6" stop-color="${mixG(Lc, Dc, .45)}"/><stop offset="1" stop-color="${Dc}"/></linearGradient>
+<linearGradient id="P${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3a3a"/><stop offset="1" stop-color="#1c1c1c"/></linearGradient>
+<radialGradient id="H${id}" cx=".36" cy=".32" r=".75"><stop offset="0" stop-color="${mixG(Lc, '#ffffff', .25 + .75 * tfo)}"/><stop offset=".7" stop-color="${Lc}"/><stop offset="1" stop-color="${Dc}"/></radialGradient>
+<radialGradient id="T${id}" cx=".34" cy=".22" r=".95"><stop offset="0" stop-color="${mixG(Lc, '#ffffff', .2)}"/><stop offset=".6" stop-color="${mixG(Lc, Dc, .4)}"/><stop offset="1" stop-color="${Dc}"/></radialGradient>
+<radialGradient id="G${id}" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffffff" stop-opacity=".9"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient></defs>`;
+ out += `<ellipse cx="${cx}" cy="272" rx="92" ry="9" fill="#000" opacity=".55"/>`;
+ if (s >= 6) out += `<ellipse cx="${cx}" cy="${f((hy + feetY) / 2)}" rx="96" ry="${f((feetY - hy) / 2 + 30)}" fill="url(#G${id})" opacity=".12"/>`;
+ if (tch > .05) out += `<ellipse cx="${cx}" cy="${f(torsoT + th / 2)}" rx="${f(tw / 2 + 40)}" ry="${f(th / 2 + 36)}" fill="url(#G${id})" opacity="${(.05 + tch * .22).toFixed(2)}"/>`;
+ if (tfo > .1) out += `<circle cx="${cx}" cy="${f(hy)}" r="${f(hr + 18)}" fill="url(#G${id})" opacity="${(tfo * .3).toFixed(2)}"/>`;
+ for (let i = 0; i < n; i++) { const w = 124 - i * 12, y = 266 - (i + 1) * step; out += `<rect x="${f(cx - w / 2)}" y="${y}" width="${w}" height="${step - 2}" rx="3" fill="${P}"/><rect x="${f(cx - w / 2 + 3)}" y="${y}" width="${w - 6}" height="1" fill="#555"/>`; }
+ out += `<g class="${an ? 'br' : ''}">`;
+ out += seg(cx - legW / 2 - gap / 2, feetY - legH, legW, legH, 0, M) + seg(cx + legW / 2 + gap / 2, feetY - legH, legW, legH, 0, M);
+ out += `<rect x="${f(cx - tw / 2)}" y="${f(torsoT)}" width="${f(tw)}" height="${f(th)}" rx="${f(Math.min(20, tw / 2))}" fill="url(#T${id})"/>`;
+ out += seg(cx - aX, aT, aw, ah, 4 - 2 * sl, M) + seg(cx + aX, aT, aw, ah, -4 + 2 * sl, M);
+ out += `<circle cx="${cx}" cy="${f(hy)}" r="${hr}" fill="url(#H${id})"/>`;
+ out += `</g></svg>`;
+ return out;
+}
+const medal = (on, i) => `<svg viewBox="0 0 70 70"><circle cx="35" cy="35" r="31" fill="url(#${on ? 'gW' : 'gD'})"/><circle cx="35" cy="35" r="24" fill="${on ? '#151515' : '#0c0c0c'}"/>${on ? cube(35, 36, 11 + (i % 3)) : '<path d="M28 33v-4a7 7 0 0 1 14 0v4" fill="none" stroke="#444" stroke-width="2.5"/><rect x="25" y="32" width="20" height="14" rx="3" fill="#333"/>'}</svg>`;
+
+/* ---------- achievements ---------- */
+const ACH = [
+ {n:'premier pas', d:'1er objectif atteint', f:A => A.validDays >= 1},
+ {n:'lancé', d:'série de 3 jours', f:A => A.best >= 3},
+ {n:'semaine propre', d:'série de 7 jours', f:A => A.best >= 7},
+ {n:'inarrêtable', d:'série de 30 jours', f:A => A.best >= 30},
+ {n:'journée parfaite', d:'toutes les missions d’un jour', f:A => A.perfect >= 1},
+ {n:'perfectionniste', d:'10 journées parfaites', f:A => A.perfect >= 10},
+ {n:'50 missions', d:'validées au total', f:A => A.missions >= 50},
+ {n:'500 missions', d:'validées au total', f:A => A.missions >= 500},
+ {n:'côté build', d:'7 jours qui penchent build', f:A => A.buildDays >= 7},
+ {n:'mois build', d:'30 jours qui penchent build', f:A => A.buildDays >= 30},
+ {n:'bâtisseur', d:'100 jours qui penchent build', f:A => A.buildDays >= 100},
+ {n:'builder', d:'rang builder', f:(A,c) => c.stage >= 3},
+ {n:'niveau 10', d:'niveau global', f:(A,c) => c.glv >= 10},
+ {n:'titan', d:'rang titan', f:(A,c) => c.stage >= 5},
+ {n:'légende', d:'rang légende', f:(A,c) => c.stage >= 6},
+ {n:'niveau 50', d:'niveau global', f:(A,c) => c.glv >= 50}];
+
+/* ---------- persistance ---------- */
+const sync = { db: null, uid: null, state: 'local', dirty: new Set(), busy: false, t: 0 };
+function saveLocal() { try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) {} }
+const monthsList = () => [...new Set(Object.keys(S.days).map(k => 'm-' + k.slice(0, 7)))];
+function bodyFor(key) {
+ if (key === 'core') { const { days, ...rest } = S; return { j: JSON.stringify({ ...rest, months: monthsList() }), upd: S.upd || 0 }; }
+ const ym = key.slice(2), days = {}; for (const k in S.days) if (k.startsWith(ym)) days[k] = S.days[k];
+ return { j: JSON.stringify(days), upd: Date.now() };
+}
+function markDirty(keys) { keys.forEach(x => sync.dirty.add(x)); clearTimeout(sync.t); sync.t = setTimeout(flush, 1200); }
+async function flush() {
+ if (!sync.db || sync.busy) return; sync.busy = true;
+ try {
+  while (sync.dirty.size) {
+   const key = [...sync.dirty][0]; sync.dirty.delete(key);
+   const ref = sync.db.doc(`data/users/${sync.uid}/${key}`), body = bodyFor(key);
+   try { await ref.set(body); }
+   catch (e) { if (e && e.code === 'unavailable') { await sleep(700 + Math.random() * 900); await ref.set(body); } else throw e; }
+  }
+  sync.state = 'cloud';
+ } catch (e) { sync.state = e && e.code === 'quota_exceeded' ? 'plein' : 'erreur'; }
+ sync.busy = false; if (sync.dirty.size) { clearTimeout(sync.t); sync.t = setTimeout(flush, 4000); }
+}
+function commit(dayK) {
+ S.upd = Date.now(); memo = null; saveLocal();
+ const keys = ['core']; if (dayK) keys.push('m-' + dayK.slice(0, 7)); markDirty(keys);
+ checkLevels(); render();
+}
+const withTimeout = (p, ms) => Promise.race([p, new Promise((_, r) => setTimeout(() => r({ code: 'timeout' }), ms))]);
+async function pull() {
+ const db = sync.db, id = sync.uid; if (!db || sync.busy || sync.dirty.size) return false;
+ const snap = await withTimeout(db.doc(`data/users/${id}/core`).get(), 10000);
+ if (!snap.exists) { if (S) markDirty(['core', ...monthsList()]); return false; }
+ const r = snap.data(), core = JSON.parse(r.j);
+ if (!S || (r.upd || 0) > (S.upd || 0)) {
+  const days = {};
+  await Promise.all((core.months || []).map(async mk => { const s2 = await db.doc(`data/users/${id}/${mk}`).get(); if (s2.exists) Object.assign(days, JSON.parse(s2.data().j)); }));
+  delete core.months; S = { ...core, days }; memo = null; saveLocal(); return true;
+ }
+ if ((S.upd || 0) > (r.upd || 0)) markDirty(['core', ...monthsList()]);
+ return false;
+}
+async function startSync() {
+ try {
+  if (!window.claude || !window.claude.use) return;
+  const [db, u] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+  if (!db || !u) return; const id = await u.id(); if (!id) return;
+  sync.db = db; sync.uid = id;
+  if (await pull()) { $('#over').innerHTML = ''; boot(); }
+  sync.state = 'cloud';
+ } catch (e) { sync.state = sync.db ? 'erreur' : 'local'; }
+}
+
+/* ---------- nouvelle partie / démo ---------- */
+function fresh(name, missions) {
+ const T = todayK();
+ memo = null;
+ S = { v: 1, name: name || 'max', start: T, set: { cut: 4, req: .7 }, v3: 1, v4: 1, missions, days: {}, demo: false, seen: null, upd: Date.now() };
+}
+function demo() {
+ const name = S ? S.name : 'max', missions = S ? S.missions : DEF_M();
+ const T = todayK(); fresh(name, missions); S.demo = true; S.start = addD(T, -45);
+ let sd = 42; const r = () => (sd = sd * 16807 % 2147483647) / 2147483647;
+ for (let k = S.start, i = 0; k < T; k = addD(k, 1), i++) {
+  const p = i / 45; const d = dayOf(k); const wd = pk(k).getDay();
+  if (i >= 12 && i <= 14) { d.b = -1; continue; }
+  const lvl = .35 + p * .55 + (r() - .5) * .25;
+  S.missions.forEach(m => { if (m.days.includes(wd) && r() < lvl + .12) d.m[m.id] = 1; });
+  d.b = r() < .25 + p * .55 ? 1 : r() < .5 ? 0 : -1;
+
+ }
+ const d = dayOf(T); d.m.pompes = 1;
+ memo = null; S.seen = snapshotLv(C()); S.goalDay = null; S.upd = Date.now(); saveLocal(); markDirty(['core', ...monthsList()]);
+}
+function realStart() { const n = S.name, m = S.missions; fresh(n, m); S.seen = snapshotLv(C()); }
+
+/* ---------- level up ---------- */
+const snapshotLv = c => ({ ...c.lv, g: c.glv, st: c.stage });
+const OQ = [];
+function showOver(html) { OQ.push(html); if (!$('#over').innerHTML) nextOver(); }
+function nextOver() { $('#over').innerHTML = OQ.shift() || ''; if ($('#over').innerHTML) buzz(); }
+const overHtml = (c, kicker, title, sub) => `<div class="full"><div class="blob"></div><div class="ob"><div style="flex:1;display:flex;align-items:center;justify-content:center;padding-top:40px"><div class="av pop lvav" style="height:min(46vh,360px)">${avatar({ t: c.t, stage: c.stage, mood: 'c', id: 'lu' + OQ.length })}</div></div>
+  <div style="padding:0 28px calc(34px + env(safe-area-inset-bottom,0px))"><div class="mute blur-in" style="font-weight:600">${kicker}</div><div class="w lvbig blur-in" style="margin:6px 0 10px">${esc(title)}</div><p class="p blur-in" style="margin-bottom:24px">${sub}</p><button class="pill" data-a="closeover">continuer</button></div></div></div>`;
+function checkLevels() {
+ const c = C(); const now = snapshotLv(c), T = todayK();
+ if (!S.seen) { S.seen = now; S.goalDay = dayCalc(T).valid ? T : null; saveLocal(); return; }
+ const b = dayCalc(T);
+ if (b.valid && S.goalDay !== T) { S.goalDay = T; if (b.perfect) S.perfDay = T; const st = streak(); setTimeout(() => showOver(overHtml(c, b.perfect ? 'journée parfaite' : 'objectif atteint', `série ${st} j`, `<b>+${fmt(b.sum)} xp aujourd’hui.</b> reviens demain pour garder ta série.`)), 350); }
+ else if (b.perfect && b.valid && S.perfDay !== T && S.goalDay === T) { S.perfDay = T; setTimeout(() => showOver(overHtml(c, 'journée parfaite', 'tout validé', '<b>toutes tes missions du jour sont faites.</b> rien à redire.')), 350); }
+ let best = null; const up = STATS.filter(s => now[s.k] > (S.seen[s.k] || 1));
+ if (now.st > S.seen.st) best = { type: 'stage' }; else if (now.g > S.seen.g) best = { type: 'glob' };
+ S.seen = now; saveLocal();
+ if (best) setTimeout(() => levelUp(best, c), 450);
+ else if (up.length) setTimeout(() => toast(`${up[0].n} niveau ${now[up[0].k]} · ${LVTXT[up[0].k]}`), 600);
+}
+const LVTXT = { force: 'il s’épaissit.', cardio: 'il s’affine.', build: 'son socle monte d’un cran.', focus: 'sa tête s’éclaire.', disc: 'il se tient plus droit.', chari: 'son aura s’étend.' };
+function levelUp(b, c) {
+ const title = b.type === 'stage' ? `rang ${STAGES[c.stage]}` : b.type === 'glob' ? `niveau ${c.glv}` : `${SN[b.k]} ${c.lv[b.k]}`;
+ const sub = b.type === 'stage' ? `nouveau matériau : ${MATS[c.stage][0]}. ${STAGE_TXT[c.stage]}` : b.type === 'glob' ? 'ton perso passe un cap.' : LVTXT[b.k];
+ showOver(overHtml(c, 'niveau supérieur', title, `<b>${esc(sub)}</b> continue comme ça, il évolue avec toi.`));
+}
+
+/* ---------- vues ---------- */
+const RULES = () => `<div class="rule"><b class="w num">+xp</b><span><b>chaque mission validée.</b> sa stat monte.</span></div><div class="rule"><b class="w num">±${BAL_XP}</b><span><b>ta balance, au bilan du soir (dès ${BAL_H}h).</b> t’as plus produit que consommé ? +${BAL_XP} en build. l’inverse ? −${BAL_XP}.</span></div><div class="rule"><b class="w num">${Math.round(req() * 100)}%</b><span><b>ton objectif du jour.</b> ${Math.round(req() * 100)} % de l’xp possible ce jour-là. atteins-le pour faire monter ta série.</span></div>`;
+const rec = b => [['missions', b.mis], ['balance', b.bx]].map(([l, v]) => `<div class="rc"><span>${l}</span><b class="num ${v < 0 ? 'neg' : ''}">${v < 0 ? '−' : '+'}${fmt(Math.abs(v))}</b></div>`).join('');
+function hint(c, b) {
+ const T = todayK(), G = b.G, next = b.ms.find(x => !x.on), lock = balLocked(T);
+ const act = activeStats(), atro = diffD(S.start, T) >= 3 ? STATS.find(s => act.has(s.k) && diffD(c.last[s.k], T) >= 3) : null;
+ if (b.valid && b.perfect) return 'journée parfaite. rien à redire.';
+ if (b.valid) return 'objectif atteint. je me sens plus fort, merci.';
+ if (danger()) return `hier raté. valide aujourd’hui pour sauver ta série de ${streak()} j.`;
+ if (!next && b.bal == null && lock) return `missions bouclées. on se retrouve à ${BAL_H}h pour le bilan.`;
+ if (b.bal === -1) return 'journée côté conso. on renverse la balance ?';
+ if (b.bal == null && !lock) return 'le bilan du soir est ouvert. ta journée a penché build ou conso ?';
+ if (atro) return `ma stat ${atro.n} redescend : ${diffD(c.last[atro.k], T)} jours sans.${next && next.m.stat === atro.k ? ` on fait ${next.m.n} ?` : ''}`;
+ if (b.sum <= 0) return next ? `on commence par quoi ? ${next.m.n} ?` : 'dis-moi vers où penche ta journée.';
+ return `encore ${fmt(G - b.sum)} xp.${next ? ` prochaine étape : ${next.m.n}.` : ''}`;
+}
+function todayCard(b, st) {
+ const G = b.G;
+ return `<button class="card today" data-a="tab" data-t="jour"><div class="row" style="display:flex;justify-content:space-between;font-weight:600"><span class="mute">aujourd’hui</span><span class="${danger() ? 'red' : 'mute'}">${danger() ? 'série en danger · ' : 'série '}<b style="color:var(--ink)" class="num">${st} j</b></span></div>
+  <div class="w num big2">${fmt(b.sum)} <small>/ ${fmt(G)} xp</small></div><div class="bar"><i style="width:${(b.comp * 100).toFixed(1)}%"></i></div>
+  <div class="ft"><span>${b.valid ? 'objectif atteint' : `encore ${fmt(G - b.sum)} xp`}</span><span style="color:var(--ink)">voir ›</span></div></button>`;
+}
+function vMoi() {
+ const c = C(), T = todayK(), b = dayCalc(T), st = streak(), md = moodOf(b);
+ const nx = STAGE_AT[c.stage + 1];
+ let h = `<section class="hero"><div class="say"><span>${esc(hint(c, b))}</span></div><div class="av">${avatar({ t: c.t, stage: c.stage, mood: md, id: 'main' })}</div>
+  <div class="who"><div><div class="w h1">${esc(S.name)}</div><div class="mute" style="font-weight:600;margin-top:4px">${STAGES[c.stage]} · ${MATS[c.stage][0]}</div></div><div class="lv"><b class="w num">${c.glv}</b><span class="sm mute">niveau</span></div></div>
+  <div class="bar" style="margin-top:14px"><i style="width:${(c.gp * 100).toFixed(1)}%"></i></div><div class="sm mute num" style="display:flex;justify-content:space-between;margin-top:6px"><span>${fmt(c.total)} xp</span><span>${nx ? `prochain : ${STAGES[c.stage + 1]} · ${MATS[c.stage + 1][0]} au niv. ${nx}` : 'rang max'}</span></div></section>`;
+ h += todayCard(b, st);
+ h += `<div class="sec"><div class="sech"><span class="w h3">stats</span><span class="sm mute">+xp aujourd’hui</span></div><div class="card" style="padding:6px 14px">`;
+ const act = activeStats();
+ STATS.forEach(s => {
+  const on = act.has(s.k), idle = diffD(c.last[s.k], T), atro = on && idle >= 3 && diffD(S.start, T) >= 3, dx = Math.round(b.xp[s.k]);
+  h += `<div class="srow" style="${on ? '' : 'opacity:.45'}"><div class="ic">${ICON[s.k]}</div><div><div class="t"><span>${s.n}</span><span class="sm ${atro || dx < 0 ? 'red' : 'mute'}">${!on ? 'aucune mission' : atro ? `redescend · ${idle} j sans` : dx > 0 ? `+${dx}` : dx < 0 ? `−${-dx}` : s.sub}</span></div><div class="bar ${atro ? 'r' : ''}"><i style="width:${(c.prog[s.k] * 100).toFixed(1)}%"></i></div></div><div class="w lvn num">${c.lv[s.k]}</div></div>`;
+ });
+ h += `</div></div><div class="sec"><div class="sech"><span class="w h3">comment gagner de l’xp</span></div><div class="card" style="padding:4px 16px 14px">${RULES()}<p class="p sm" style="margin-top:12px"><b>rater un jour, ça arrive.</b> deux jours de suite, ta série repart à zéro. une stat que tu ne travailles pas pendant 3 jours redescend doucement.</p></div></div>`;
+ return h;
+}
+function ringSvg(f) { const R = 52, L = 2 * Math.PI * R; return `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="${R}" fill="none" stroke="#222" stroke-width="10"/><circle cx="60" cy="60" r="${R}" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-dasharray="${(L * clamp(f, 0, 1)).toFixed(1)} ${L.toFixed(1)}"/></svg>`; }
+function vJour() {
+ const T = todayK(), k = ui.day || T, b = dayCalc(k), G = b.G, ed = editable(k);
+ let h = `<div class="dnav"><button class="ib" data-a="dprev" aria-label="jour précédent" ${k <= S.start ? 'disabled' : ''}>‹</button><div style="text-align:center"><div class="w h3">${k === T ? 'aujourd’hui' : k === addD(T, -1) ? 'hier' : dLabel(k)}</div><div class="sm mute">${dLabel(k)}</div></div><button class="ib" data-a="dnext" aria-label="jour suivant" ${k >= T ? 'disabled' : ''}>›</button></div>`;
+ h += `<div class="card dayhead"><div class="ring">${ringSvg(b.comp)}<b class="w num rtx">${fmt(b.sum)}<span>/ ${fmt(G)} xp</span></b></div><div><div class="w h3" style="margin-bottom:6px">${b.valid ? 'objectif atteint' : `encore ${fmt(G - b.sum)} xp`}</div>${rec(b)}</div></div>`;
+ h += `<div class="sec"><div class="sech"><span class="w h3">missions</span><span class="sm mute">${b.done}/${b.ms.length} validées</span></div>${ed ? '' : '<p class="p sm" style="margin:0 4px 10px">jour passé : lecture seule. tu peux modifier aujourd’hui et hier.</p>'}`;
+ if (!b.ms.length) h += `<div class="card p">aucune mission ce jour-là. ajoute-en dans les réglages.</div>`;
+ const tick = '<svg width="20" height="20" viewBox="0 0 20 20"><path d="m4.5 10.5 3.6 3.6 7.4-8" fill="none" stroke="#000" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+ b.ms.forEach(({ m, on }) => {
+  h += `<div class="mis ${on ? 'on' : ''} ${ed ? '' : 'ro'}" ${ed ? `data-a="tog" data-id="${m.id}" role="button" tabindex="0"` : ''} aria-pressed="${on}"><div class="ic">${ICON[m.stat]}</div><div><div class="mn">${esc(m.n)}</div><div class="ms">+${m.xp} xp ${SN[m.stat]}</div></div><span class="chk ${on ? 'on' : ''}">${on ? tick : ''}</span></div>`;
+ });
+ h += `</div>` + balCard(k, b);
+ return h;
+}
+function balSvg(bal) {
+ const a = bal === 1 ? -11 : bal === -1 ? 11 : 0, r = a * Math.PI / 180, cx = 150, cy = 34, L = 104;
+ const lx = cx - L * Math.cos(r), ly = cy - L * Math.sin(r), rx = cx + L * Math.cos(r), ry = cy + L * Math.sin(r), dim = bal == null;
+ const pan = (x, y) => `<path d="M${(x - 30).toFixed(1)} ${(y + 46).toFixed(1)}L${x.toFixed(1)} ${y.toFixed(1)}L${(x + 30).toFixed(1)} ${(y + 46).toFixed(1)}" fill="none" stroke="#555" stroke-width="1.5"/><ellipse cx="${x.toFixed(1)}" cy="${(y + 48).toFixed(1)}" rx="36" ry="7" fill="url(#gM)"/>`;
+ return `<svg viewBox="0 0 300 160" class="${dim ? 'dim' : ''}"><ellipse cx="150" cy="150" rx="70" ry="8" fill="#151515"/><path d="M146 36V146h8V36Z" fill="url(#gM)"/><ellipse cx="150" cy="146" rx="34" ry="7" fill="url(#gD)"/>
+  <path d="M${lx.toFixed(1)} ${ly.toFixed(1)}L${rx.toFixed(1)} ${ry.toFixed(1)}" stroke="#d6d6d6" stroke-width="7" stroke-linecap="round"/><circle cx="${cx}" cy="${cy}" r="8" fill="url(#gW)"/>
+  ${pan(lx, ly)}${pan(rx, ry)}${cube(+lx.toFixed(1), +(ly + 28).toFixed(1), bal === 1 ? 19 : 15)}
+  <g transform="translate(${(rx - 11).toFixed(1)} ${(ry + 13).toFixed(1)})"><rect width="22" height="34" rx="5" fill="#0d0d0d" stroke="#888" stroke-width="1.5"/><rect x="3.5" y="4" width="15" height="25" rx="2" fill="${bal === -1 ? '#fff' : '#555'}"/></g></svg>`;
+}
+const BAL_H = 17;
+const balLocked = k => { const h = new Date().getHours(); return k === todayK() && h >= cut() && h < BAL_H; };
+function balCard(k, b) {
+ const lock = balLocked(k);
+ const BL = [[-1, 'surtout conso', `−${BAL_XP} xp`], [0, 'moitié-moitié', '0 xp'], [1, 'surtout build', `+${BAL_XP} xp`]];
+ const line = b.bal === 1 ? `<b>+${BAL_XP} xp build.</b> tu produis plus que tu consommes.` : b.bal === 0 ? '<b>équilibré.</b> ni bonus, ni malus.' : b.bal === -1 ? `<b>−${BAL_XP} xp build.</b> demain, on renverse la balance.` : '<b>pas besoin de chiffres.</b> dis juste vers où a penché ta journée.';
+ if (lock) return `<section class="ratio bal sec"><div class="w h2">bilan du soir</div><p class="p sm" style="margin:6px 0 0">s’ouvre à ${BAL_H}h.</p><div class="balfig">${balSvg(null)}</div><p class="p sm" style="margin-top:4px"><b>fais tes missions, on fera les comptes ce soir.</b> d’ici là, construis.</p></section>`;
+ return `<section class="ratio bal sec"><div class="w h2">bilan du soir</div><p class="p sm" style="margin:6px 0 0"><b>1. ta balance.</b> ${k === todayK() ? 'aujourd’hui' : 'ce jour-là'}, t’as plus produit ou plus consommé ?</p><div class="balfig">${balSvg(b.bal)}</div>
+  <div class="g3b">${BL.map(([v, l, x]) => `<button class="bopt ${b.bal === v ? 'on' : ''}" ${editable(k) ? `data-a="bal" data-v="${v}"` : 'disabled'} aria-pressed="${b.bal === v}"><b>${l}</b><span>${x}</span></button>`).join('')}</div>
+  <p class="p sm" style="margin-top:12px">${line}</p><p class="p sm" style="margin:18px 0 10px"><b>2. tes comptes.</b> ton xp du jour et l’avis du coach.</p><button class="pill" data-a="bilan">voir mon bilan</button></section>`;
+}
+function regCard(T) {
+ const days = Array.from({ length: 7 }, (_, i) => addD(T, i - 6));
+ const rows = S.missions.filter(m => !m.off).map(m => {
+  let n = 0, tot = 0;
+  const cells = days.map(k => { const sch = k >= S.start && m.days.includes(pk(k).getDay()); if (!sch) return '<i class="na"></i>'; tot++; const on = !!(S.days[k] && S.days[k].m && S.days[k].m[m.id]); if (on) n++; return `<i class="${on ? 'on' : ''}"></i>`; }).join('');
+  return `<div class="reg"><span>${esc(m.n)}</span><div class="dots">${cells}</div><b class="num">${tot ? `${n}/${tot}` : '—'}</b></div>`;
+ }).join('');
+ return `<div class="sec card"><div class="sech" style="margin:0 0 8px"><span class="w h3">régularité</span><span class="sm mute">7 derniers jours</span></div><div class="reg hd"><span></span><div class="dots">${days.map(k => `<i class="lb">${JOURS[pk(k).getDay()].slice(0, 1)}</i>`).join('')}</div><b></b></div>${rows || '<p class="p sm">aucune mission active.</p>'}</div>`;
+}
+function vEvo() {
+ const c = C(), T = todayK(), A = c.A, age = diffD(S.start, T);
+ let h = `<div class="w h1" style="margin:6px 4px 4px">évolution</div><p class="p" style="margin:0 4px 18px"><b>${age + 1} jour${age ? 's' : ''} de jeu.</b> ${fmt(c.total)} xp, ${A.validDays} objectifs atteints, meilleure série ${A.best} j.</p>`;
+ const steps = [56, 28, 14, 0].filter(n => n <= age);
+ if (steps.length < 2 && age > 0) steps.unshift(age);
+ h += `<div class="tl">${steps.map(n => { const cc = n ? compute(addD(T, -n)) : c; return `<div>${avatar({ t: cc.t, stage: cc.stage, anim: false, id: 'tl' + n })}<div class="sm" style="font-weight:700">${n ? `il y a ${n >= 7 && n % 7 === 0 ? (n / 7) + ' sem.' : n + ' j'}` : 'aujourd’hui'}</div><div class="sm mute">niv. ${cc.glv}</div></div>`; }).join('')}</div>`;
+ h += regCard(T);
+ h += `<div class="sec card"><div class="sech" style="margin:0 0 6px"><span class="w h3">objectif par jour</span><span class="sm mute">14 jours</span></div><div class="fig" id="fmir"><svg></svg></div><p class="p sm" style="margin-top:8px">pointillés : l’objectif du jour. <b>barre blanche = objectif atteint.</b></p></div>`;
+ h += `<div class="sec tots">${[[A.validDays, 'objectifs atteints'], [A.best + ' j', 'meilleure série'], [fmt(A.missions), 'missions validées'], [A.perfect, 'journées parfaites'], [A.buildDays, 'jours côté build'], [A.consoDays, 'jours côté conso']].map(([v, l]) => `<div class="kpi"><b class="w num">${v}</b><span>${l}</span></div>`).join('')}</div>`;
+ h += `<div class="sec"><div class="sech"><span class="w h3">trophées</span><span class="sm mute">${ACH.filter(a => a.f(A, c)).length}/${ACH.length}</span></div><div class="card ach">${ACH.map((a, i) => { const on = a.f(A, c); return `<div class="${on ? '' : 'lk'}">${medal(on, i)}${esc(a.n)}<div class="mute" style="font-weight:500">${esc(a.d)}</div></div>`; }).join('')}</div></div>`;
+ return h;
+}
+let roM = null;
+function drawEvo() {
+ const fm = $('#fmir svg'); if (!fm) return;
+ const T = todayK(); const days = []; for (let i = 13; i >= 0; i--) { const k = addD(T, -i); days.push(k >= S.start ? dayCalc(k) : { sum: 0, G: 1, k }); }
+ const dm = () => { const W = fm.clientWidth, H = fm.clientHeight; if (!W) return; const mx = 1.3, base = H - 22, top = 8, sc = (base - top) / mx, bw = (W - 8) / 14, gy = base - sc;
+  let s = `<line x1="0" x2="${W}" y1="${base}" y2="${base}" stroke="#333"/><line x1="0" x2="${W}" y1="${gy.toFixed(1)}" y2="${gy.toFixed(1)}" stroke="#777" stroke-dasharray="4 5"/>`;
+  days.forEach((d, i) => { const x = 4 + i * bw + bw * .16, w = bw * .68, hh = clamp((d.sum || 0) / (d.G || 1), 0, mx) * sc;
+   if (hh) s += `<rect x="${x.toFixed(1)}" y="${(base - hh).toFixed(1)}" width="${w.toFixed(1)}" height="${hh.toFixed(1)}" rx="${Math.min(5, w / 2).toFixed(1)}" fill="${d.valid ? '#f4f4f4' : '#454545'}"/>`;
+   else s += `<rect x="${x.toFixed(1)}" y="${base - 2}" width="${w.toFixed(1)}" height="2" rx="1" fill="#2a2a2a"/>`;
+   if (W >= 360 || i % 2 === 0) s += `<text x="${(x + w / 2).toFixed(1)}" y="${H - 4}" text-anchor="middle" font-size="12" fill="${i === 13 ? '#fff' : '#777'}">${i === 13 ? 'auj.' : JOURS[pk(d.k).getDay()].slice(0, 1)}</text>`; });
+  fm.innerHTML = s; };
+ if (roM) roM.disconnect();
+ roM = new ResizeObserver(dm); roM.observe(fm);
+}
+
+/* ---------- rendu ---------- */
+function render() {
+ if (!S) return;
+ const v = $('#view');
+ v.innerHTML = ui.tab === 'jour' ? vJour() : ui.tab === 'evo' ? vEvo() : vMoi();
+ document.querySelectorAll('#tabs button').forEach(b => { const on = b.dataset.t === ui.tab; b.classList.toggle('on', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+ $('#demo').innerHTML = S.demo ? `<div class="banner"><span>mode démo · 6 semaines simulées</span><button class="pill sm" style="min-height:36px;padding:0 14px;font-size:14px;white-space:normal" data-a="real">démarrer pour de vrai</button></div>` : '';
+ if (ui.tab === 'evo') drawEvo();
+}
+function setTab(t) { ui.tab = t; if (t !== 'jour') ui.day = null; try { history.replaceState(null, '', '#' + t); } catch (e) {} render(); window.scrollTo(0, 0); }
+
+/* ---------- toast & sheet ---------- */
+let tT = 0;
+function toast(msg, undo) {
+ $('#tmsg').textContent = msg; const u = $('#tund'); u.hidden = !undo; ui.undo = undo || null;
+ $('#toast').classList.add('on'); clearTimeout(tT); tT = setTimeout(() => $('#toast').classList.remove('on'), undo ? 4200 : 2200);
+}
+$('#tund').addEventListener('click', () => { if (ui.undo) { ui.undo(); ui.undo = null; } $('#toast').classList.remove('on'); });
+function sheet(html) { $('#sheet').innerHTML = `<div class="grab"></div>` + html; $('#sw').classList.add('on'); $('#sheet').scrollTop = 0; }
+function closeSheet() { $('#sw').classList.remove('on'); }
+const snapDay = k => { const before = JSON.stringify(S.days[k] || null); return () => { const v = JSON.parse(before); if (v) S.days[k] = v; else delete S.days[k]; commit(k); }; };
+
+/* ---------- bilan & coach ---------- */
+function bilan() {
+ const k = ui.day || todayK(), b = dayCalc(k), d = dayOf(k), G = b.G, live = k === todayK();
+ sheet(`<div class="w h2">bilan · ${k === todayK() ? 'aujourd’hui' : dLabel(k)}</div><div class="w num" style="font-size:44px;margin:12px 0 2px">${b.sum < 0 ? '−' : '+'}${fmt(Math.abs(b.sum))} xp</div><p class="p" style="margin-bottom:12px"><b>${b.valid ? (b.perfect ? 'journée parfaite.' : 'objectif atteint.') : live ? `il te manque ${fmt(G - b.sum)} xp. il reste du temps.` : `objectif raté de ${fmt(G - b.sum)} xp.`}</b> objectif du jour : ${fmt(G)} xp.</p>
+  <div class="card" style="background:#1b1b1b;padding:12px 16px">${rec(b)}</div>
+  <label class="l">où est parti ton xp</label><div class="chips">${STATS.map(s => { const v = Math.round(b.xp[s.k]); return `<span class="chip ${v > 0 ? 'on' : ''}">${s.n} ${v < 0 ? '−' + -v : '+' + v}</span>`; }).join('')}</div>
+  ${HAS_CLAUDE ? `<div class="sech" style="margin:22px 4px 10px"><span class="w h3">le coach</span><span class="sm mute">${d.deb ? 'enregistré' : ''}</span></div><div class="coach" id="coach">${d.deb ? esc(d.deb) : '<span class="mute">il lit ta journée et te dit les choses telles qu’elles sont.</span>'}</div>
+  <div class="prow" style="margin-top:14px"><button class="pill g" data-a="close">fermer</button><button class="pill" data-a="coach" data-k="${k}">${d.deb ? 'redemander' : 'avis du coach'}</button></div>` : '<button class="pill" style="margin-top:22px" data-a="close">fermer</button>'}`);
+}
+let sampleP = null;
+const getSample = () => sampleP || (sampleP = (window.claude && window.claude.use ? window.claude.use('sample').catch(() => null) : Promise.resolve(null)));
+function context(k) {
+ const b = dayCalc(k), c = C();
+ const weak = STATS.slice().sort((a, z) => c.xp[a.k] - c.xp[z.k])[0];
+ return { prenom_du_perso: S.name, date: dLabel(k), rang: STAGES[c.stage], niveau_global: c.glv, serie_jours: streak(),
+  niveaux: Object.fromEntries(STATS.map(s => [s.n, c.lv[s.k]])), stat_la_plus_faible: weak.n,
+  missions: b.ms.map(x => ({ mission: x.m.n, validee: x.on })),
+  xp_du_jour: b.sum, objectif_xp_du_jour: b.G, journee_parfaite: b.perfect, objectif_atteint: b.valid, balance_du_jour: b.bal === 1 ? 'plus produit que consommé' : b.bal === -1 ? 'plus consommé que produit' : b.bal === 0 ? 'moitié-moitié' : 'pas renseignée' };
+}
+async function coach(k) {
+ const box = $('#coach'), d = dayOf(k); box.innerHTML = '<span class="mute">le coach lit ta journée…</span>';
+ const sample = await getSample();
+ if (!sample) { box.innerHTML = '<span class="mute">le coach n’est pas joignable depuis cette vue. le reste de l’app marche sans lui.</span>'; return; }
+ const prompt = `tu es le coach intégré d'evolvr, une app où un perso évolue selon la vraie journée du joueur (chaque mission validée donne de l'xp ; chaque jour il dit si sa journée a penché build ou conso : +50 ou −50 xp ; objectif quotidien en xp). voici sa journée en json :\n${JSON.stringify(context(k))}\n\nécris-lui un bilan en français, tout en minuscules, en le tutoyant, ton direct de coach, sans emoji, sans flatterie gratuite : si la journée est molle, dis-le franchement mais sans l'humilier. 4 phrases maximum (70 mots max). cite au moins un chiffre réel. termine par une seule mission concrète pour demain, qui commence par "demain :". réponds uniquement avec le texte.`;
+ try {
+  const r = await sample(prompt, { modelTier: 'quick', cache: false, onText: ({ text }) => { box.textContent = text; } });
+  d.deb = (r && r.text || box.textContent || '').trim(); box.textContent = d.deb; S.upd = Date.now(); saveLocal(); markDirty(['core', 'm-' + k.slice(0, 7)]);
+ } catch (e) { box.innerHTML = `<span class="mute">${e && e.code === 'not_granted' ? 'tu n’as pas autorisé le coach.' : e && e.code === 'rate_limited' ? 'le coach souffle un peu, réessaie dans une minute.' : 'le coach n’a pas répondu. réessaie plus tard.'}</span>`; }
+}
+/* ---------- réglages ---------- */
+function settings(go) {
+ const st = sync.state === 'cloud' ? 'sauvegardé dans ton compte claude, sur tous tes appareils.' : sync.state === 'erreur' ? 'la sauvegarde en ligne a échoué, tes données restent sur cet appareil.' : sync.state === 'plein' ? 'espace de sauvegarde plein.' : HAS_CLAUDE ? 'sauvegardé sur cet appareil uniquement.' : 'sauvegardé sur ce téléphone. pense à copier une sauvegarde de temps en temps (options avancées).';
+ sheet(`<div class="w h2">réglages</div>
+  <label class="l" for="sname">nom du perso</label><input class="inp" id="sname" maxlength="20" value="${esc(S.name)}" autocomplete="off">
+  <label class="l" for="sreq">exigence de l’objectif du jour</label><select class="inp" id="sreq">${[[.6, 'souple · 60 % de l’xp possible'], [.7, 'normal · 70 %'], [.85, 'exigeant · 85 %'], [1, 'parfait · 100 %']].map(([v, l]) => `<option value="${v}" ${req() === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
+  <label class="l" for="scut">ta journée se termine à</label><select class="inp" id="scut">${[0, 1, 2, 3, 4, 5, 6].map(h => `<option value="${h}" ${cut() === h ? 'selected' : ''}>${h}h du matin</option>`).join('')}</select>
+  <div class="sech" style="margin:24px 4px 6px"><span class="w h3">missions</span>${S.missions.length < MAXM ? '<button class="sm" style="font-weight:700;min-height:44px" data-a="medit" data-id="">+ ajouter</button>' : `<span class="sm mute">${MAXM} max</span>`}</div>
+  ${S.missions.map(m => `<button class="tog" data-a="medit" data-id="${m.id}"><span>${esc(m.n)}<span class="sm mute" style="display:block;font-weight:500">${SN[m.stat]} · +${m.xp} xp · ${m.days.length === 7 ? 'tous les jours' : m.days.map(d => JOURS[d]).join(' ')}${m.off ? ' · en pause' : ''}</span></span><span class="mute">›</span></button>`).join('')}
+  <div class="sech" style="margin:24px 4px 6px"><span class="w h3">données</span></div><p class="p sm" style="margin:0 4px 12px">${st}</p>
+  <details class="adv"><summary class="tog"><span>options avancées</span><span class="mute">›</span></summary>
+  <div class="prow" style="margin-top:12px"><button class="pill sm g" data-a="intro">revoir l’intro</button><button class="pill sm g" data-a="demo">voir la démo</button></div>
+  <div class="prow" style="margin-top:10px"><button class="pill sm g" data-a="export">copier une sauvegarde</button><button class="pill sm g" data-a="import">importer</button></div>
+  <button class="pill sm o" style="margin-top:10px;width:100%;color:var(--red)" data-a="wipe">nouveau compte : tout effacer</button></details>
+  <button class="pill" style="margin-top:22px" data-a="close">ok</button>`);
+ $('#sname').addEventListener('change', e => { S.name = e.target.value.trim().slice(0, 20) || 'max'; commit(); });
+ $('#sreq').addEventListener('change', e => { S.set.req = +e.target.value; commit(); });
+ $('#scut').addEventListener('change', e => { S.set.cut = +e.target.value; commit(); });
+}
+function mEdit(id) {
+ const m = S.missions.find(x => x.id === id) || { id: '', n: '', stat: 'force', xp: 30, days: ALL.slice() };
+ sheet(`<div class="w h2">${m.id ? 'mission' : 'nouvelle mission'}</div>
+  <label class="l" for="mn">nom</label><input class="inp" id="mn" maxlength="40" value="${esc(m.n)}" placeholder="ex. 50 squats" autocomplete="off">
+  <div class="prow"><div><label class="l" for="ms">stat</label><select class="inp" id="ms">${STATS.map(s => `<option value="${s.k}" ${m.stat === s.k ? 'selected' : ''}>${s.n}</option>`).join('')}</select></div><div><label class="l" for="mx">xp</label><select class="inp" id="mx">${[10, 20, 25, 30, 35, 40, 45, 50, 60, 80, 100].map(v => `<option value="${v}" ${m.xp === v ? 'selected' : ''}>+${v} xp</option>`).join('')}</select></div></div>
+  <label class="l">jours</label><div class="chips" id="mdays">${[1, 2, 3, 4, 5, 6, 0].map(d => `<button class="chip ${m.days.includes(d) ? 'on' : ''}" data-a="mday" data-d="${d}">${JOURS[d]}</button>`).join('')}</div>
+  ${m.id ? `<button class="tog ${m.off ? '' : 'on'}" data-a="moff" style="margin-top:10px"><span>active</span><span class="sw"></span></button>` : ''}
+  <div class="prow" style="margin-top:20px">${m.id ? `<button class="pill g" data-a="mdel" data-id="${m.id}">supprimer</button>` : `<button class="pill g" data-a="settings">annuler</button>`}<button class="pill" data-a="msave" data-id="${m.id}">enregistrer</button></div>`);
+}
+
+/* ---------- actions ---------- */
+function floatXp(e, v) { if (!e || !v) return; const el = document.createElement('div'); el.className = 'fx' + (v < 0 ? ' neg' : ''); el.textContent = `${v > 0 ? '+' : '−'}${Math.abs(v)} xp`; el.style.left = (e.clientX || innerWidth / 2) + 'px'; el.style.top = (e.clientY || innerHeight / 2) + 'px'; document.body.appendChild(el); setTimeout(() => el.remove(), 950); }
+const misX = (k, id) => { const x = dayCalc(k).ms.find(y => y.m.id === id); return x ? x.x : 0; };
+const ACT = {
+ tab: d => setTab(d.t), close: closeSheet, closeover: () => nextOver(),
+ settings: d => settings(d.go),
+ dprev: () => { const k = ui.day || todayK(); if (k > S.start) { ui.day = addD(k, -1); render(); } },
+ dnext: () => { const k = ui.day || todayK(); if (k < todayK()) { ui.day = addD(k, 1); if (ui.day === todayK()) ui.day = null; render(); } },
+ tog: (d, el, e) => { const k = ui.day || todayK(); if (!editable(k)) return; const day = dayOf(k), b0 = misX(k, d.id); day.m[d.id] = day.m[d.id] ? 0 : 1; buzz(); commit(k); floatXp(e, misX(k, d.id) - b0); },
+ bilan: () => { if (!balLocked(ui.day || todayK())) bilan(); }, coach: d => coach(d.k),
+ bal: (d, el, e) => { const k = ui.day || todayK(); if (balLocked(k) || !editable(k)) return; const day = dayOf(k), b0 = dayCalc(k).bx, v = +d.v; day.b = day.b === v ? null : v; buzz(); commit(k); floatXp(e, dayCalc(k).bx - b0); },
+ medit: d => mEdit(d.id),
+ mday: (d, el) => el.classList.toggle('on'),
+ moff: (d, el) => el.classList.toggle('on'),
+ msave: d => {
+  const n = $('#mn').value.trim(); if (!n) { $('#mn').focus(); return; }
+  const days = [...document.querySelectorAll('#mdays .chip.on')].map(e => +e.dataset.d); if (!days.length) { toast('choisis au moins un jour'); return; }
+  let m = S.missions.find(x => x.id === d.id); if (!m) { if (S.missions.length >= MAXM) { toast(`${MAXM} missions max : garde l’essentiel`); return; } m = { id: uid() }; S.missions.push(m); }
+  Object.assign(m, { n: n.slice(0, 40), type: 'check', stat: $('#ms').value, xp: clamp(+$('#mx').value || 30, 5, 200), days });
+  const off = document.querySelector('[data-a=moff]'); if (off) m.off = !off.classList.contains('on');
+  commit(); settings();
+ },
+ mdel: (d, el) => { if (!el.dataset.arm) { el.dataset.arm = 1; el.textContent = 'confirmer ?'; return; } S.missions = S.missions.filter(m => m.id !== d.id); commit(); settings(); },
+ export: async (d, el) => { const j = JSON.stringify(S); try { await navigator.clipboard.writeText(j); toast('sauvegarde copiée'); } catch (e) { sheet(`<div class="w h2">sauvegarde</div><p class="p sm" style="margin:8px 0 12px">copie ce texte et garde-le quelque part.</p><textarea class="inp" style="min-height:220px;font-size:13px" readonly>${esc(j)}</textarea><button class="pill" style="margin-top:14px" data-a="settings">retour</button>`); } },
+ import: () => sheet(`<div class="w h2">importer</div><p class="p sm" style="margin:8px 0 12px"><b>colle une sauvegarde evolvr.</b> elle remplace les données actuelles.</p><textarea class="inp" id="imp" style="min-height:200px;font-size:13px"></textarea><div class="prow" style="margin-top:14px"><button class="pill g" data-a="settings">annuler</button><button class="pill" data-a="doimp">importer</button></div>`),
+ doimp: () => { try { const o = JSON.parse($('#imp').value); if (!o || !Array.isArray(o.missions) || typeof o.days !== 'object' || !o.start) throw 0; S = o; S.upd = Date.now(); S.seen = null; memo = null; markDirty(['core', ...monthsList()]); closeSheet(); commit(); toast('sauvegarde importée'); } catch (e) { toast('ce texte n’est pas une sauvegarde valide'); } },
+ demo: (d, el) => { if (!S.demo && !el.dataset.arm && Object.keys(S.days).length) { el.dataset.arm = 1; el.textContent = 'remplace tes données ?'; return; } demo(); closeSheet(); setTab('moi'); toast('démo chargée'); },
+ real: () => { realStart(); S.upd = Date.now(); saveLocal(); markDirty(['core']); setTab('moi'); toast('c’est parti. jour 1.'); },
+ intro: () => { closeSheet(); onboarding(true); },
+ wipe: async (d, el) => { if (!el.dataset.arm) { el.dataset.arm = 1; el.textContent = 'sûr ? tout sera effacé'; return; }
+  const months = monthsList(); clearTimeout(sync.t); sync.dirty.clear(); S = null; memo = null;
+  try { localStorage.removeItem(LS); } catch (e) {}
+  closeSheet(); $('#app').hidden = true; $('#tabs').hidden = true; $('#view').innerHTML = '';
+  try { history.replaceState(null, '', '#moi'); } catch (e) {}
+  onboarding(false);
+  if (sync.db) { for (const k of ['core', ...months]) { try { await sync.db.doc(`data/users/${sync.uid}/${k}`).delete(); } catch (e) {} } } }
+};
+document.addEventListener('click', e => { const a = e.target.closest('[data-a]'); if (!a) return; const f = ACT[a.dataset.a]; if (f) { e.preventDefault(); f(a.dataset, a, e); } });
+document.addEventListener('keydown', e => {
+ if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role=button][data-a]')) { e.preventDefault(); e.target.click(); }
+ if (e.key === 'Escape') closeSheet();
+});
+window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (['moi', 'jour', 'evo'].includes(h) && h !== ui.tab) setTab(h); });
+document.addEventListener('visibilitychange', async () => { if (document.hidden || !S) return; memo = null; render(); try { if (await pull()) { checkLevels(); render(); } } catch (e) {} });
+
+/* ---------- onboarding (façon pushr) ---------- */
+const LOGO = (h = 34) => `<svg viewBox="0 0 170 40" style="height:${h}px;width:auto;display:block" aria-label="evolvr"><text x="2" y="31" fill="#f4f4f4" filter="url(#gl)" class="w" style="font-size:34px">evolvr</text></svg>`;
+function onboarding(replay) {
+ const ov = $('#over'); let name = S ? S.name : 'max'; const ms = (S ? S.missions : DEF_M()).map(m => ({ ...m }));
+ const zero = { force: 0, cardio: 0, build: 0, focus: 0, disc: 0, chari: 0 }, mid = { force: .7, cardio: .5, build: .8, focus: .7, disc: .9, chari: .5 };
+ const frame = inner => `<div class="full"><div class="blob"></div><div class="ob">${inner}</div></div>`;
+ const sheetb = (ill, body) => `<div class="sheetb"><div class="ill">${ill}</div><div class="tx">${body}</div></div>`;
+ const steps = [
+  () => { ov.innerHTML = frame(`<div class="mid"><div class="w h1 blur-in" id="salut">salut</div></div>`); setTimeout(() => { const s = $('#salut'); if (s) s.className = 'w h1 blur-out'; }, 1300); setTimeout(next, 1900); },
+  () => { ov.innerHTML = frame(`<div style="padding:0 22px calc(28px + env(safe-area-inset-bottom,0px))"><div class="w h1 blur-in">bienvenue à</div><div class="blur-in" style="margin-top:6px">${LOGO(40)}</div><p class="p blur-in" style="margin:18px 4px 24px;animation-delay:.15s"><b>evolvr est le jeu où le perso, c’est toi.</b> chaque chose que tu fais dans la vraie vie le fait évoluer : ton sport, ton taff, ce que tu construis.</p><button class="pill blur-in" style="animation-delay:.3s" data-o="next">allons-y</button></div>`); },
+  () => { ov.innerHTML = frame(sheetb(avatar({ t: zero, stage: 0, anim: false, id: 'o1' }).replace('viewBox="0 0 240 290"', 'viewBox="20 40 200 250"'), `<p class="p" style="margin-top:0"><b>ton perso part de zéro.</b> il est mou, il se tient mal, il n’a rien construit.</p><p class="p"><b>tu fais tes pompes, il prend du muscle.</b> tu bosses sur ton business, son socle monte. tu lâches trois jours, il redescend.</p><button class="pill" data-o="next">j’ai compris</button>`)); },
+  () => { ov.innerHTML = frame(sheetb(`<svg viewBox="0 0 200 150"><ellipse cx="100" cy="132" rx="80" ry="10" fill="#111"/>${cube(70, 74, 40)}<g opacity=".55"><rect x="138" y="92" width="26" height="42" rx="6" fill="#0c0c0c" stroke="#777" stroke-width="2"/><rect x="142" y="97" width="18" height="30" rx="3" fill="#555"/></g></svg>`, `<div class="w h2" style="margin-bottom:6px">les règles</div>${RULES()}<p class="p" style="margin-top:14px"><b>rater un jour, ça arrive.</b> deux de suite, ta série repart à zéro.</p><button class="pill" data-o="next">continuer</button>`)); },
+  () => { ov.innerHTML = frame(sheetb(avatar({ t: mid, stage: 3, anim: false, id: 'o2', mood: 'c' }).replace('viewBox="0 0 240 290"', 'viewBox="20 40 200 250"'), `<div class="w h2">comment il s’appelle ?</div><p class="p" style="margin:10px 0 14px">tu pourras le changer plus tard.</p><input class="inp w" id="oname" maxlength="20" value="${esc(name)}" style="font-size:22px;margin-bottom:14px" autocomplete="off"><button class="pill" data-o="name">continuer</button>`)); setTimeout(() => { const i = $('#oname'); if (i) i.focus(); }, 500); },
+  () => { ov.innerHTML = frame(`<div class="sheetb"><div class="tx" style="max-height:78vh;overflow:auto"><div class="w h2">tes missions de base</div><p class="p" style="margin:10px 0 12px"><b>calquées sur ta vraie vie.</b> garde celles qui comptent, tu pourras tout modifier.</p>${ms.map((m, i) => `<button class="tog ${m.off ? '' : 'on'}" data-o="mt" data-i="${i}"><span>${esc(m.n)}<span class="sm mute" style="display:block;font-weight:500">${SN[m.stat]} · +${m.xp} xp</span></span><span class="sw"></span></button>`).join('')}<button class="pill" style="margin-top:18px" data-o="next">continuer</button></div></div>`); },
+  () => { ov.innerHTML = frame(`<div class="sheetb"><div class="solo"><svg width="56" height="56" viewBox="0 0 56 56" style="display:block;margin-bottom:22px"><circle cx="28" cy="28" r="22" fill="none" stroke="#3a3a3a" stroke-width="5"/><g class="spin-r" style="transform-origin:28px 28px"><path d="M28 6a22 22 0 0 1 22 22" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/></g></svg><div class="w h2">mettre les choses en place</div></div></div>`); setTimeout(next, 2200); },
+  () => { ov.innerHTML = frame(`<div class="sheetb"><div class="tx" style="background:#1b1b1b"><div class="w h2">configuration terminée</div><p class="p">passons à l’action en commençant ta première journée.</p><div class="prow"><button class="pill g" data-o="demo">voir la démo</button><button class="pill" data-o="go">commencer</button></div></div></div>`); }];
+ let i = replay ? 1 : 0;
+ function next() { i++; if (steps[i]) steps[i](); }
+ function finish(withDemo) {
+  ms.forEach(m => { if (!m.off) delete m.off; });
+  if (!S || !replay) { fresh(name, ms); S.seen = snapshotLv(C()); } else { S.name = name; S.missions = ms; }
+  if (withDemo) demo();
+  S.upd = Date.now(); memo = null; saveLocal(); markDirty(['core', ...monthsList()]);
+  ov.removeEventListener('click', h); ov.innerHTML = ''; boot();
+ }
+ const h = e => { const b = e.target.closest('[data-o]'); if (!b) return; const o = b.dataset.o; buzz();
+  if (o === 'next') next();
+  else if (o === 'name') { name = ($('#oname').value || '').trim().slice(0, 20) || 'max'; next(); }
+  else if (o === 'mt') { const m = ms[+b.dataset.i]; m.off = !m.off; b.classList.toggle('on', !m.off); }
+  else if (o === 'demo') finish(true); else if (o === 'go') finish(false); };
+ ov.addEventListener('click', h);
+ ov.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'oname') { e.preventDefault(); const b = ov.querySelector('[data-o=name]'); if (b) b.click(); } });
+ steps[i]();
+}
+
+/* ---------- démarrage ---------- */
+function boot() {
+ $('#app').hidden = false; $('#tabs').hidden = false;
+ if (!S.set) S.set = { cut: 4 };
+ if (!S.v4) { S.missions = S.missions.filter(m => m.type !== 'auto').map(m => { if (m.type === 'count') { for (const k in S.days) { const dm = S.days[k].m; if (dm && dm[m.id] != null) dm[m.id] = dm[m.id] >= m.target ? 1 : 0; } } return { id: m.id, n: m.id === 'pompes' && m.n === 'pompes' ? '100 pompes' : m.id === 'pas' && m.n === 'pas' ? '8 000 pas' : m.n, type: 'check', stat: m.stat, xp: m.xp, days: m.days, ...(m.off ? { off: true } : {}) }; }); if (!S.set.goal) S.set.goal = 200; S.v4 = 1; S.v3 = 1; saveLocal(); markDirty(['core', ...monthsList()]); }
+ if (!S.set.req) S.set.req = .7;
+ if (!S.v3) { S.missions = S.missions.filter(m => m.type !== 'auto'); if (!S.set.goal) S.set.goal = 200; S.v3 = 1; saveLocal(); }
+ if (!S.days) S.days = {};
+ const h = location.hash.slice(1); ui.tab = h === 'build' ? 'jour' : ['moi', 'jour', 'evo'].includes(h) ? h : 'moi';
+ memo = null; checkLevels(); render();
+}
+if (S && S.missions && S.start) boot(); else { S = null; onboarding(false); }
+if (!HAS_CLAUDE) { try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {} if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {}); }
+startSync();
+})();
+</script>
+</body>
+</html>
