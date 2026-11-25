@@ -148,7 +148,10 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .duel span{font-size:13px;color:var(--mute);font-weight:600}
 .duel .r{text-align:right}.duel .r b{color:#8c8c8c}
 .rule{display:grid;grid-template-columns:58px minmax(0,1fr);gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--ln);color:var(--mute);font-size:15px}
-.rule b{font-size:20px;text-align:right;color:var(--ink)}
+.rule b{font-size:20px;text-align:right;color:var(--ink);line-height:1}
+.rule b i{display:block;font-style:normal;font-size:12px;color:var(--mute);margin-top:3px;font-family:Inter,sans-serif;font-stretch:100%}
+.rule .rx{display:flex;justify-content:space-between;margin-top:6px;padding:7px 10px;border-radius:10px;background:var(--s2);color:var(--ink);font-weight:600;font-size:14px}
+.rule .rx+.rx{margin-top:4px}
 .rule span b{font-size:15px;font-family:inherit;font-stretch:100%;font-variation-settings:normal;text-align:left;font-weight:700}
 .reg{display:grid;grid-template-columns:minmax(0,1fr) auto 40px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--ln);font-weight:600;font-size:15px}
 .reg span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -341,11 +344,16 @@ const LIB = [
  ['tête', [['lecture 20 min', 'tete'], ['10 min de méditation', 'tete'], ['1h de deep work', 'tete'], ['apprendre un truc nouveau', 'tete'], ['appeler un proche', 'tete']]],
  ['discipline', [['zéro scroll avant midi', 'disc'], ['couché avant minuit', 'disc'], ['réveil sans snooze', 'disc'], ['lit fait le matin', 'disc'], ['boire 2 l d’eau', 'disc']]],
  ['build', [['1h sur mon projet', 'build'], ['publier un contenu', 'build'], ['prospection', 'build'], ['2h de taff concentré', 'build']]]];
+const guessStat = n => { const t = n.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+ if (/sport|pompe|squat|abdo|muscu|salle|gym|course|courir|run|pas\b|marche|velo|natation|nage|etirement|yoga|foot|basket|tennis|boxe|cardio|fitness|crossfit|hiit|traction/.test(t)) return 'corps';
+ if (/projet|taff|travail|boulot|business|client|prospect|vente|appel|contenu|post|publier|video|code|coder|dev|site|boutique|shop|freelance|mail|devis|business/.test(t)) return 'build';
+ if (/lire|lecture|livre|apprendre|cours|etude|etudier|meditation|mediter|langue|anglais|podcast|ecrire|journal|deep work|guitare|piano|musique|dessin/.test(t)) return 'tete';
+ return 'disc'; };
 const libM = (c, j) => { const [n, stat] = LIB[c][1][j]; return { id: uid(), n, type: 'check', stat, days: ALL.slice() }; };
 const STAGES = ['npc','rookie','grinder','builder','operator','titan','légende'];
 const STAGE_AT = [1,2,4,6,9,14,20];
 const MATS = [['argile','#8e8e8e','#474747'],['graphite','#a6a6a6','#545454'],['acier','#c3c3c3','#676767'],['aluminium','#dcdcdc','#828282'],['titane','#ececec','#9a9a9a'],['céramique','#f8f8f8','#b9b9b9'],['lumière','#ffffff','#d4d4d4']];
-const STAGE_TXT = ['il attend que tu bouges.','il commence à y croire.','il serre les dents chaque jour.','il construit, brique par brique.','il exécute sans négocier.','plus rien ne le ralentit.','il est devenu ce que tu disais.'];
+const STAGE_TXT = ['tout commence ici.','tu commences à y croire.','tu serres les dents chaque jour.','tu construis, brique par brique.','tu exécutes sans négocier.','plus rien ne te ralentit.','tu es devenu ce que tu disais.'];
 const LS = 'evolvr.v1';
 const HAS_CLAUDE = !!(window.claude && window.claude.use);
 let S = null;
@@ -549,23 +557,23 @@ function checkLevels() {
  const c = C(); const now = snapshotLv(c), T = todayK();
  if (!S.seen) { S.seen = now; S.goalDay = dayCalc(T).valid ? T : null; saveLocal(); return; }
  const b = dayCalc(T);
- if (b.valid && S.goalDay !== T) { S.goalDay = T; if (b.perfect) S.perfDay = T; const st = streak(); setTimeout(() => showOver(overHtml(c, b.perfect ? 'journée parfaite' : 'objectif atteint', `série ${st} j`, `<b>${b.done}/${b.n} missions validées.</b> reviens demain pour garder ta série.`)), 350); }
+ if (b.valid && S.goalDay !== T) { S.goalDay = T; if (b.perfect) S.perfDay = T; const st = streak(); setTimeout(() => showOver(overHtml(c, b.perfect ? 'journée parfaite' : 'objectif atteint', `série : ${plural(st, 'jour')}`, `<b>${b.done}/${b.n} missions validées.</b> reviens demain pour garder ta série.`)), 350); }
  else if (b.perfect && b.valid && S.perfDay !== T && S.goalDay === T) { S.perfDay = T; setTimeout(() => showOver(overHtml(c, 'journée parfaite', 'tout validé', '<b>toutes tes missions du jour sont faites.</b> rien à redire.')), 350); }
  let best = null; const up = STATS.filter(s => now[s.k] > (S.seen[s.k] || 1));
  if (now.st > S.seen.st) best = { type: 'stage' }; else if (now.g > S.seen.g) best = { type: 'glob' };
  S.seen = now; saveLocal();
  if (best) setTimeout(() => levelUp(best, c), 450);
- else if (up.length) setTimeout(() => toast(`${up[0].n} · ${LVTXT[up[0].k]}`), 600);
+ else if (up.length) setTimeout(() => toast(`${up[0].n} niveau ${now[up[0].k]} : ${LVTXT[up[0].k]}`), 600);
 }
-const LVTXT = { corps: 'il s’épaissit.', tete: 'sa tête s’éclaire.', disc: 'il se tient plus droit.', build: 'son socle monte d’un cran.' };
+const LVTXT = { corps: 'ton perso prend du muscle.', tete: 'ton perso a l’esprit plus vif.', disc: 'ton perso se tient plus droit.', build: 'le socle de ton perso monte.' };
 function levelUp(b, c) {
  const title = b.type === 'stage' ? `rang ${STAGES[c.stage]}` : b.type === 'glob' ? `niveau ${c.glv}` : `${SN[b.k]} ${c.lv[b.k]}`;
- const sub = b.type === 'stage' ? `nouveau matériau : ${MATS[c.stage][0]}. ${STAGE_TXT[c.stage]}` : b.type === 'glob' ? 'ton perso passe un cap.' : LVTXT[b.k];
+ const sub = b.type === 'stage' ? STAGE_TXT[c.stage] : b.type === 'glob' ? 'ton perso passe un cap.' : LVTXT[b.k];
  showOver(overHtml(c, 'niveau supérieur', title, `<b>${esc(sub)}</b> continue comme ça, il évolue avec toi.`));
 }
 
 /* ---------- vues ---------- */
-const RULES = () => `<div class="rule"><b class="w num">+${MXP}</b><span><b>par mission cochée.</b> ton perso progresse là où tu bosses : le sport muscle son corps, le taff fait monter son build.</span></div><div class="rule"><b class="w num">±${BAL_XP}</b><span><b>le soir, dès ${BAL_H}h : une question.</b> ta journée a été productive ? +${BAL_XP} xp. plutôt scroll et écrans ? −${BAL_XP} xp.</span></div><div class="rule"><b class="w num">${Math.round(req() * 100)}%</b><span><b>de tes missions cochées = objectif atteint.</b> ta série monte d’un jour.</span></div>`;
+const RULES = () => `<div class="rule"><b class="w num">+${MXP}<i>xp</i></b><span><b>chaque mission cochée.</b> la stat liée monte : le sport fait grossir ton corps, le taff ton build…</span></div><div class="rule"><b class="w num">±${BAL_XP}<i>xp</i></b><span><b>le bilan du soir, à partir de ${BAL_H}h.</b> tu dis comment s’est passée ta journée.<span class="rx"><span>productive</span><span>+${BAL_XP} xp</span></span><span class="rx"><span>scroll et écrans</span><span>−${BAL_XP} xp</span></span></span></div><div class="rule"><b class="w num">${Math.round(req() * 100)}<i>%</i></b><span><b>l’objectif du jour.</b> coche ${Math.round(req() * 100)} % de tes missions : ta série monte d’un jour.</span></div>`;
 const rec = b => [['missions', b.mis], ['bilan du soir', b.bx]].map(([l, v]) => `<div class="rc"><span>${l}</span><b class="num ${v < 0 ? 'neg' : ''}">${v < 0 ? '−' : '+'}${fmt(Math.abs(v))} xp</b></div>`).join('');
 const left = b => Math.max(0, b.G - b.done);
 const plural = (n, w) => `${n} ${w}${n > 1 ? 's' : ''}`;
@@ -574,7 +582,7 @@ function hint(c, b) {
  const act = activeStats(), atro = diffD(S.start, T) >= 3 ? STATS.find(s => act.has(s.k) && diffD(c.last[s.k], T) >= 3) : null;
  if (b.valid && b.perfect) return 'journée parfaite. rien à redire.';
  if (b.valid) return 'objectif atteint. je me sens plus fort, merci.';
- if (danger()) return `hier raté. valide aujourd’hui pour sauver ta série de ${streak()} j.`;
+ if (danger()) return `hier raté. valide aujourd’hui pour sauver ta série de ${plural(streak(), 'jour')}.`;
  if (!next && b.bal == null && lock) return `missions bouclées. on se retrouve à ${BAL_H}h pour le bilan.`;
  if (b.bal === -1) return 'les écrans ont gagné aujourd’hui. on renverse demain ?';
  if (b.bal == null && !lock) return 'le bilan du soir est ouvert. alors, journée productive ?';
@@ -584,7 +592,7 @@ function hint(c, b) {
  return `encore ${plural(left(b), 'mission')}.${next ? ` prochaine : ${next.m.n}.` : ''}`;
 }
 function todayCard(b, st) {
- return `<button class="card today" data-a="tab" data-t="jour"><div class="row" style="display:flex;justify-content:space-between;font-weight:600"><span class="mute">aujourd’hui</span><span class="${danger() ? 'red' : 'mute'}">${danger() ? 'série en danger · ' : 'série '}<b style="color:var(--ink)" class="num">${st} j</b></span></div>
+ return `<button class="card today" data-a="tab" data-t="jour"><div class="row" style="display:flex;justify-content:space-between;font-weight:600"><span class="mute">aujourd’hui</span><span class="${danger() ? 'red' : 'mute'}">${danger() ? 'série en danger · ' : 'série '}<b style="color:var(--ink)" class="num">${plural(st, 'jour')}</b></span></div>
   <div class="w num big2">${b.done} <small>/ ${b.n} missions</small></div><div class="bar"><i style="width:${(b.n ? b.done / b.n * 100 : 0).toFixed(1)}%"></i></div>
   <div class="ft"><span>${b.rest ? 'jour de repos' : b.valid ? (b.perfect ? 'journée parfaite' : 'objectif atteint') : `objectif : ${b.G} · encore ${left(b)}`}</span><span style="color:var(--ink)">voir ›</span></div></button>`;
 }
@@ -592,14 +600,14 @@ function vMoi() {
  const c = C(), T = todayK(), b = dayCalc(T), st = streak(), md = moodOf(b);
  const nx = STAGE_AT[c.stage + 1];
  let h = `<section class="hero"><div class="say"><span>${esc(hint(c, b))}</span></div><div class="av">${avatar({ t: c.av, stage: c.stage, mood: md, id: 'main' })}</div>
-  <div class="who"><div><div class="w h1">${esc(S.name)}</div><div class="mute" style="font-weight:600;margin-top:4px">${STAGES[c.stage]} · ${MATS[c.stage][0]}</div></div><div class="lv"><b class="w num">${c.glv}</b><span class="sm mute">niveau</span></div></div>
-  <div class="bar" style="margin-top:14px"><i style="width:${(c.gp * 100).toFixed(1)}%"></i></div><div class="sm mute" style="margin-top:6px">${nx ? `prochain rang : ${STAGES[c.stage + 1]} · ${MATS[c.stage + 1][0]}, au niveau ${nx}` : 'rang max atteint'}</div></section>`;
+  <div class="who"><div><div class="w h1">${esc(S.name)}</div><div class="mute" style="font-weight:600;margin-top:4px">rang ${STAGES[c.stage]}</div></div><div class="lv"><b class="w num">${c.glv}</b><span class="sm mute">niveau</span></div></div>
+  <div class="bar" style="margin-top:14px"><i style="width:${(c.gp * 100).toFixed(1)}%"></i></div><div class="sm mute" style="margin-top:6px">${nx ? `prochain rang : ${STAGES[c.stage + 1]}, au niveau ${nx}` : 'rang max atteint'}</div></section>`;
  h += todayCard(b, st);
  h += `<div class="sec"><div class="sech"><span class="w h3">stats</span></div><div class="card" style="padding:6px 14px">`;
  const act = activeStats();
  STATS.forEach(s => {
   const on = act.has(s.k), idle = diffD(c.last[s.k], T), atro = on && idle >= 3 && diffD(S.start, T) >= 3, dx = Math.round(b.xp[s.k]);
-  h += `<div class="srow" style="${on ? '' : 'opacity:.45'}"><div class="ic">${ICON[s.k]}</div><div><div class="t"><span>${s.n}</span><span class="sm ${atro || dx < 0 ? 'red' : 'mute'}">${!on ? 'aucune mission' : atro ? `redescend · ${idle} j sans` : dx > 0 ? `+${dx}` : dx < 0 ? `−${-dx}` : s.sub}</span></div><div class="bar ${atro ? 'r' : ''}"><i style="width:${(c.prog[s.k] * 100).toFixed(1)}%"></i></div></div></div>`;
+  h += `<div class="srow" style="${on ? '' : 'opacity:.45'}"><div class="ic">${ICON[s.k]}</div><div><div class="t"><span>${s.n}</span><span class="sm ${atro || dx < 0 ? 'red' : 'mute'}">${!on ? 'aucune mission' : atro ? `baisse · ${idle} jours sans` : dx > 0 ? `+${dx} xp aujourd’hui` : dx < 0 ? `−${-dx} xp aujourd’hui` : s.sub}</span></div><div class="bar ${atro ? 'r' : ''}"><i style="width:${(c.prog[s.k] * 100).toFixed(1)}%"></i></div></div></div>`;
  });
  h += `</div></div><div class="sec"><div class="sech"><span class="w h3">les règles</span></div><div class="card" style="padding:4px 16px 14px">${RULES()}<p class="p sm" style="margin-top:12px"><b>rater un jour, ça arrive.</b> deux de suite, ta série repart à zéro. une stat pas travaillée pendant 3 jours redescend doucement.</p></div></div>`;
  return h;
@@ -653,9 +661,9 @@ function vEvo() {
  let h = `<div class="w h1" style="margin:6px 4px 4px">évolution</div><p class="p" style="margin:0 4px 18px"><b>${age + 1} jour${age ? 's' : ''} de jeu.</b> ${A.validDays} objectif${A.validDays > 1 ? 's' : ''} atteint${A.validDays > 1 ? 's' : ''}.</p>`;
  const steps = [56, 28, 14, 0].filter(n => n <= age);
  if (steps.length < 2 && age > 0) steps.unshift(age);
- h += `<div class="tl">${steps.map(n => { const cc = n ? compute(addD(T, -n)) : c; return `<div>${avatar({ t: cc.av, stage: cc.stage, anim: false, id: 'tl' + n })}<div class="sm" style="font-weight:700">${n ? `il y a ${n >= 7 && n % 7 === 0 ? (n / 7) + ' sem.' : n + ' j'}` : 'aujourd’hui'}</div><div class="sm mute">niv. ${cc.glv}</div></div>`; }).join('')}</div>`;
+ h += `<div class="tl">${steps.map(n => { const cc = n ? compute(addD(T, -n)) : c; return `<div>${avatar({ t: cc.av, stage: cc.stage, anim: false, id: 'tl' + n })}<div class="sm" style="font-weight:700">${n ? `il y a ${n >= 7 && n % 7 === 0 ? plural(n / 7, 'semaine') : plural(n, 'jour')}` : 'aujourd’hui'}</div><div class="sm mute">niveau ${cc.glv}</div></div>`; }).join('')}</div>`;
  h += regCard(T);
- h += `<div class="sec tots">${[[A.best + ' j', 'meilleure série'], [fmt(A.missions), 'missions validées'], [A.buildDays, 'journées productives']].map(([v, l]) => `<div class="kpi"><b class="w num">${v}</b><span>${l}</span></div>`).join('')}</div>`;
+ h += `<div class="sec tots">${[[plural(A.best, 'jour'), 'meilleure série'], [fmt(A.missions), 'missions validées'], [A.buildDays, 'journées productives']].map(([v, l]) => `<div class="kpi"><b class="w num">${v}</b><span>${l}</span></div>`).join('')}</div>`;
  h += `<div class="sec"><div class="sech"><span class="w h3">trophées</span><span class="sm mute">${ACH.filter(a => a.f(A, c)).length}/${ACH.length}</span></div><div class="card ach">${ACH.map((a, i) => { const on = a.f(A, c); return `<div class="${on ? '' : 'lk'}">${medal(on, i)}${esc(a.n)}<div class="mute" style="font-weight:500">${esc(a.d)}</div></div>`; }).join('')}</div></div>`;
  return h;
 }
@@ -673,14 +681,14 @@ function setTab(t) { ui.tab = t; if (t !== 'jour') ui.day = null; try { history.
 /* ---------- visite guidée ---------- */
 const TOUR = [
  ['moi', '.hero .av', 'ça, c’est toi.', 'ton perso évolue avec ce que tu fais en vrai. au début il est mou, à toi de le construire.'],
- ['moi', '.hero .who', 'ton niveau', 'chaque mission cochée te donne de l’xp. plus tu montes, plus ton perso change de rang et de matière.'],
+ ['moi', '.hero .who', 'ton niveau', 'chaque mission cochée te donne de l’xp. en montant de niveau, ton perso passe des rangs : npc, rookie, grinder…'],
  ['moi', '.today', 'ta journée', 'tes missions faites aujourd’hui. touche ici pour aller les cocher.'],
- ['moi', '.srow', 'tes 4 stats', 'le sport fait monter ton corps, la lecture ta tête, tes routines ta discipline, ton taff ton build.', 1],
+ ['moi', '.srow', 'tes 4 stats', 'chaque mission fait monter une stat : le sport ton corps, la lecture ta tête, tes routines ta discipline, ton taff ton build.', 1],
  ['jour', '.mis', 'coche tes missions', 'touche une mission quand c’est fait : +30 xp. coche-en assez pour atteindre l’objectif du jour.'],
  ['jour', '[data-a="missions"]', 'tes missions, ta vie', 'ajoute, modifie ou supprime tes missions ici. mets tes vraies habitudes.'],
- ['jour', '.bal', 'le bilan du soir', 'dès 17h, une seule question : ta journée a été productive, ou plutôt scroll et écrans ? +50 ou −50 xp.'],
+ ['jour', '.bal', 'le bilan du soir', 'à partir de 17h, tu dis comment s’est passée ta journée : productive (+50 xp) ou scroll et écrans (−50 xp).'],
  ['evo', '.tl', 'ton évolution', 'ton perso au fil des semaines. reviens dans un mois, tu verras la différence.'],
- ['evo', '.reg', 'ta régularité', 'chaque mission sur les 7 derniers jours. un rond blanc = fait.', 1],
+ ['evo', '.reg', 'ta régularité', 'chaque mission sur les 7 derniers jours. un carré blanc = mission faite ce jour-là.', 1],
  ['evo', '.ach', 'tes trophées', 'à débloquer en tenant ta série et tes journées productives.'],
  ['moi', '.setb', 'réglages', 'ton nom, tes missions, ta sauvegarde. tout est là.']];
 function tour(i) {
@@ -796,12 +804,14 @@ function mEdit(id) {
  const m = S.missions.find(x => x.id === id) || { id: '', n: '', stat: 'corps', days: ALL.slice() }, ms0 = STAT_MAP[m.stat] || 'corps';
  sheet(`<div class="w h2">${m.id ? 'mission' : 'nouvelle mission'}</div>
   <label class="l" for="mn">nom</label><input class="inp" id="mn" maxlength="40" value="${esc(m.n)}" placeholder="ex. 50 squats" autocomplete="off">
-  <label class="l">ça fait monter</label><div class="chips" id="mstats">${STATS.map(st => `<button class="chip ${ms0 === st.k ? 'on' : ''}" data-a="mstat" data-k="${st.k}">${st.n}</button>`).join('')}</div>
+  <label class="l">quelle stat ça fait monter ?</label><div class="chips" id="mstats">${STATS.map(st => `<button class="chip ${ms0 === st.k ? 'on' : ''}" data-a="mstat" data-k="${st.k}">${st.n}</button>`).join('')}</div><p class="p sm" id="mstatd" style="margin:8px 4px 0">${STATS.find(x => x.k === ms0).n} : ${STATS.find(x => x.k === ms0).sub}</p>
   <label class="l">jours</label><div class="chips" id="mdays">${[1, 2, 3, 4, 5, 6, 0].map(d => `<button class="chip ${m.days.includes(d) ? 'on' : ''}" data-a="mday" data-d="${d}">${JOURS[d]}</button>`).join('')}</div>
   ${m.id ? `<button class="tog ${m.off ? '' : 'on'}" data-a="moff" style="margin-top:10px"><span>active</span><span class="sw"></span></button>` : ''}
   <div class="prow" style="margin-top:20px">${m.id ? `<button class="pill g" data-a="mdel" data-id="${m.id}">supprimer</button>` : `<button class="pill g" data-a="missions">annuler</button>`}<button class="pill" data-a="msave" data-id="${m.id}">enregistrer</button></div>`);
+ if (!m.id) $('#mn').addEventListener('input', e => { if (!$('#mstats').dataset.man) setStatChip(guessStat(e.target.value)); });
 }
 
+function setStatChip(k) { document.querySelectorAll('#mstats .chip').forEach(c => c.classList.toggle('on', c.dataset.k === k)); const st = STATS.find(x => x.k === k), p = $('#mstatd'); if (p && st) p.textContent = `${st.n} : ${st.sub}`; }
 /* ---------- actions ---------- */
 function floatXp(e, v) { if (!e || !v) return; const el = document.createElement('div'); el.className = 'fx' + (v < 0 ? ' neg' : ''); el.textContent = `${v > 0 ? '+' : '−'}${Math.abs(v)} xp`; el.style.left = (e.clientX || innerWidth / 2) + 'px'; el.style.top = (e.clientY || innerHeight / 2) + 'px'; document.body.appendChild(el); setTimeout(() => el.remove(), 950); }
 const misX = (k, id) => { const x = dayCalc(k).ms.find(y => y.m.id === id); return x ? x.x : 0; };
@@ -815,7 +825,7 @@ const ACT = {
  bal: (d, el, e) => { const k = ui.day || todayK(); if (balLocked(k) || !editable(k)) return; const day = dayOf(k), b0 = dayCalc(k).bx, v = +d.v, first = day.b == null; day.b = day.b === v ? null : v; buzz(); commit(k); floatXp(e, dayCalc(k).bx - b0); if (first && day.b != null) setTimeout(() => { if (!$('#over').innerHTML) bilan(); else ui.bilanNext = true; }, 650); },
  medit: d => mEdit(d.id),
  mday: (d, el) => el.classList.toggle('on'),
- mstat: (d, el) => { document.querySelectorAll('#mstats .chip').forEach(c => c.classList.toggle('on', c === el)); },
+ mstat: (d, el) => { el.closest('#mstats').dataset.man = 1; setStatChip(d.k); },
  moff: (d, el) => el.classList.toggle('on'),
  msave: d => {
   const n = $('#mn').value.trim(); if (!n) { $('#mn').focus(); return; }
@@ -858,7 +868,7 @@ document.addEventListener('visibilitychange', async () => { if (document.hidden 
 /* ---------- onboarding (façon pushr) ---------- */
 const LOGO = (h = 34) => `<svg viewBox="0 0 170 40" style="height:${h}px;width:auto;display:block" aria-label="evolvr"><text x="2" y="31" fill="#f4f4f4" filter="url(#gl)" class="w" style="font-size:34px">evolvr</text></svg>`;
 function onboarding(replay) {
- const ov = $('#over'); let name = S ? S.name : '', cst = 'corps'; const ms = (S ? S.missions : []).map(m => ({ ...m }));
+ const ov = $('#over'); let name = S ? S.name : ''; const ms = (S ? S.missions : []).map(m => ({ ...m }));
  const zero = { force: 0, cardio: 0, build: 0, focus: 0, disc: 0, chari: 0 }, mid = { force: .7, cardio: .42, build: .8, focus: .7, disc: .9, chari: 0 };
  const frame = inner => `<div class="full"><div class="blob"></div><div class="ob">${inner}</div></div>`;
  const sheetb = (ill, body) => `<div class="sheetb"><div class="ill">${ill}</div><div class="tx">${body}</div></div>`;
@@ -874,12 +884,13 @@ function onboarding(replay) {
  function renderMis() {
   const have = new Set(ms.map(m => m.n.toLowerCase())), keep = $('#ocust') ? $('#ocust').value : '';
   const mine = ms.filter(m => !LIB.some(([, it]) => it.some(x => x[0].toLowerCase() === m.n.toLowerCase())));
-  ov.innerHTML = frame(`<div class="sheetb"><div class="tx" style="max-height:84vh;overflow:auto"><div class="w h2">choisis tes missions</div><p class="p" style="margin:10px 0 6px"><b>tes vraies habitudes du quotidien.</b> touche pour ajouter. tu pourras tout changer plus tard.</p>
+  const sc = ov.querySelector('.tx') ? ov.querySelector('.tx').scrollTop : 0, again = !!ov.querySelector('#ocust');
+  ov.innerHTML = frame(`<div class="sheetb"${again ? ' style="animation:none"' : ''}><div class="tx" style="max-height:84vh;overflow:auto"><div class="w h2">choisis tes missions</div><p class="p" style="margin:10px 0 6px"><b>tes vraies habitudes du quotidien.</b> touche pour ajouter. tu pourras tout changer plus tard.</p>
    ${LIB.map(([cat, items], c) => `<div class="sm mute" style="margin:14px 2px 7px;font-weight:600">${cat}</div><div class="chips">${items.map((it, j) => `<button class="chip ${have.has(it[0].toLowerCase()) ? 'on' : ''}" data-o="lib" data-c="${c}" data-j="${j}">${esc(it[0])}</button>`).join('')}</div>`).join('')}
    <div class="sm mute" style="margin:18px 2px 7px;font-weight:600">les tiennes</div>${mine.length ? `<div class="chips" style="margin-bottom:10px">${mine.map(m => `<button class="chip on" data-o="rm" data-id="${m.id}">${esc(m.n)} ×</button>`).join('')}</div>` : ''}
    <div class="prow"><input class="inp" id="ocust" maxlength="40" placeholder="ex. 30 min de guitare" autocomplete="off" value="${esc(keep)}"><button class="pill sm" style="flex:0 0 auto" data-o="cadd">ajouter</button></div>
-   <div class="chips" style="margin-top:8px">${STATS.map(st => `<button class="chip ${cst === st.k ? 'on' : ''}" data-o="cst" data-k="${st.k}" style="min-height:34px;font-size:13px">${st.n}</button>`).join('')}</div>
    <button class="pill ${ms.length ? '' : 'g'}" style="margin-top:20px;position:sticky;bottom:0;box-shadow:0 -12px 24px #07090a" data-o="mgo">${ms.length ? `continuer · ${ms.length} mission${ms.length > 1 ? 's' : ''}` : 'choisis au moins une mission'}</button></div></div>`);
+  const tx = ov.querySelector('.tx'); if (tx) tx.scrollTop = sc;
  }
  let i = replay ? 1 : 0;
  function next() { i++; if (steps[i]) steps[i](); }
@@ -894,8 +905,7 @@ function onboarding(replay) {
   else if (o === 'name') { const inp = $('#oname'), v = (inp.value || '').trim().slice(0, 20); if (!v) { inp.focus(); inp.placeholder = 'écris un nom'; inp.classList.add('need'); return; } name = v; next(); }
   else if (o === 'lib') { const n = LIB[+b.dataset.c][1][+b.dataset.j][0].toLowerCase(), at = ms.findIndex(m => m.n.toLowerCase() === n); if (at >= 0) ms.splice(at, 1); else if (ms.length < MAXM) ms.push(libM(+b.dataset.c, +b.dataset.j)); renderMis(); }
   else if (o === 'rm') { const at = ms.findIndex(m => m.id === b.dataset.id); if (at >= 0) ms.splice(at, 1); renderMis(); }
-  else if (o === 'cst') { cst = b.dataset.k; renderMis(); }
-  else if (o === 'cadd') { const inp = $('#ocust'), n = inp.value.trim().slice(0, 40); if (!n) { inp.focus(); return; } if (ms.length < MAXM) ms.push({ id: uid(), n, type: 'check', stat: cst, days: ALL.slice() }); inp.value = ''; renderMis(); }
+  else if (o === 'cadd') { const inp = $('#ocust'), n = inp.value.trim().slice(0, 40); if (!n) { inp.focus(); return; } if (ms.length < MAXM) ms.push({ id: uid(), n, type: 'check', stat: guessStat(n), days: ALL.slice() }); inp.value = ''; renderMis(); }
   else if (o === 'mgo') { if (ms.length) next(); }
   else if (o === 'go') finish(true); };
  ov.addEventListener('click', h);
